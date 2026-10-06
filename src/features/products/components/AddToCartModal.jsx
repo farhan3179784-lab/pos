@@ -112,15 +112,20 @@ const AddToCartContent = ({ product, onConfirm, onClose }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Product Snapshot */}
       <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-14 h-14 object-cover rounded-xl border border-slate-200 bg-white shrink-0"
-          onError={(e) => {
-            e.target.src =
-              'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&auto=format&fit=crop&q=80';
-          }}
-        />
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-14 h-14 object-cover rounded-xl border border-slate-200 bg-white shrink-0"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        ) : (
+          <div className="w-14 h-14 rounded-xl bg-slate-900 border border-slate-800 text-indigo-300 flex items-center justify-center font-bold shrink-0 shadow-xs">
+            <Icon name="barcode" size={22} />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-bold text-slate-800 truncate">{product.name}</h4>
           {product.nameUrdu && (

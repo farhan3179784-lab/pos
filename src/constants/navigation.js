@@ -1,26 +1,16 @@
 export const NAV_ITEMS = [
   {
-    path: '/',
-    label: 'Dashboard',
-    icon: 'dashboard',
-    description: 'Analytics & KPIs',
-  },
-  {
     path: '/products',
     label: 'Products',
+    labelUrdu: 'پروڈکٹس',
     icon: 'products',
-    description: 'Catalog & POS sales',
+    description: 'Catalog & Stock',
   },
   {
-    path: '/inventory',
-    label: 'Inventory',
-    icon: 'inventory',
-    description: 'Stock ledger & alerts',
-  },
-  {
-    path: '/orders',
-    label: 'Orders',
-    icon: 'orders',
-    description: 'Transaction history',
+    path: '/billing',
+    label: 'POS Billing',
+    labelUrdu: 'بل کاؤنٹر',
+    icon: 'billing',
+    description: 'Quick Billing & Urdu Slip',
   },
 ];

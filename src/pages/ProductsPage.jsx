@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -7,25 +8,24 @@ import { ProductCard } from '../features/products/components/ProductCard';
 import { ProductTable } from '../features/products/components/ProductTable';
 import { ProductFilters } from '../features/products/components/ProductFilters';
 import { ProductFormModal } from '../features/products/components/ProductFormModal';
-import { AddToCartModal } from '../features/products/components/AddToCartModal';
 import { useStore } from '../hooks/useStore';
-import { useCart } from '../hooks/useCart';
 import { calculateStockStatus } from '../utils/posCalculations';
+import { Icon } from '../components/ui/Icon';
 
 export const ProductsPage = () => {
+  const navigate = useNavigate();
   const { products, isLoading, saveProduct, deleteProduct } = useStore();
-  const { addItem } = useCart();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [stockFilter, setStockFilter] = useState('all');
   const [sortOption, setSortOption] = useState('name_asc');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
+  const [viewMode, setViewMode] = useState('table'); // Default to table for easy POS view
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletingProduct, setDeletingProduct] = useState(null);
-  const [activeAddToCartProduct, setActiveAddToCartProduct] = useState(null);
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -33,7 +33,9 @@ export const ProductsPage = () => {
       .filter((p) => {
         const matchesSearch =
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.sku.toLowerCase().includes(searchQuery.toLowerCase());
+          p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (p.barcode && p.barcode.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (p.nameUrdu && p.nameUrdu.includes(searchQuery));
         const matchesCategory =
           selectedCategory === 'All Categories' || p.category === selectedCategory;
         const status = calculateStockStatus(p.stock, p.threshold);
@@ -52,29 +54,69 @@ export const ProductsPage = () => {
   }, [products, searchQuery, selectedCategory, stockFilter, sortOption]);
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading product catalog..." />;
+    return <LoadingSpinner message="پروڈکٹس لوڈ ہو رہے ہیں..." />;
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-            Product Catalog
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {products.length} products registered • {filteredProducts.length} displayed
-          </p>
+      {/* Feedback Banner */}
+      {feedbackMessage && (
+        <div className="p-3.5 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-2xl text-sm font-extrabold flex items-center justify-between shadow-xs animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">✓</span>
+            <span>{feedbackMessage}</span>
+          </div>
+          <button
+            onClick={() => setFeedbackMessage(null)}
+            className="text-emerald-700 hover:text-emerald-950 font-black text-sm px-2 cursor-pointer"
+          >
+            ✕
+          </button>
         </div>
-        <Button
-          variant="primary"
-          size="md"
-          icon="plus"
-          onClick={() => { setEditingProduct(null); setIsFormModalOpen(true); }}
-        >
-          Add Product
-        </Button>
+      )}
+
+      {/* Header Bar (Large, Clear Fonts) */}
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+              <Icon name="products" size={24} />
+            </span>
+            <div>
+              <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
+                پروڈکٹس مینیجر اور اسٹاک (Product Management)
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                کل {products.length} پروڈکٹس رجسٹرڈ ہیں • نیا سامان شامل کریں، قیمت اور اسٹاک تبدیل کریں
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Button
+            variant="secondary"
+            size="md"
+            icon="billing"
+            onClick={() => navigate('/billing')}
+            className="text-xs sm:text-sm font-extrabold"
+          >
+            بل کاؤنٹر (Go to Billing)
+          </Button>
+
+          <Button
+            variant="primary"
+            size="md"
+            icon="plus"
+            onClick={() => {
+              setEditingProduct(null);
+              setIsFormModalOpen(true);
+            }}
+            className="text-xs sm:text-sm font-extrabold"
+          >
+            نیا پروڈکٹ شامل کریں (+ Add Product)
+          </Button>
+        </div>
       </div>
 
       {/* Filters Toolbar */}
@@ -91,59 +133,68 @@ export const ProductsPage = () => {
         onViewModeChange={setViewMode}
       />
 
-      {/* Product Content (Grid vs Table) */}
+      {/* Products Content: Table or Grid */}
       {filteredProducts.length === 0 ? (
         <EmptyState
           icon="search"
-          title="No products match your criteria"
-          description="Try modifying search keywords or resetting category and stock filters."
-          actionLabel="Reset Filters"
+          title="کوئی پروڈکٹ نہیں ملا"
+          description="فلٹر تبدیل کریں یا اوپر سے نیا پروڈکٹ رجسٹر کریں۔"
+          actionLabel="فلٹر ری سیٹ کریں"
           onAction={() => {
             setSearchQuery('');
             setSelectedCategory('All Categories');
             setStockFilter('all');
           }}
         />
-      ) : viewMode === 'grid' ? (
+      ) : viewMode === 'table' ? (
+        <ProductTable
+          products={filteredProducts}
+          onAddToCart={(prod) => {
+            // When clicked on products page, dispatch event and navigate to billing
+            window.dispatchEvent(new CustomEvent('pos-barcode-scanned', { detail: prod }));
+            navigate('/billing');
+          }}
+          onEdit={(prod) => {
+            setEditingProduct(prod);
+            setIsFormModalOpen(true);
+          }}
+          onDelete={(prod) => setDeletingProduct(prod)}
+        />
+      ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
-              onAddToCart={(prod) => setActiveAddToCartProduct(prod)}
-              onEdit={(prod) => { setEditingProduct(prod); setIsFormModalOpen(true); }}
+              onAddToCart={(prod) => {
+                window.dispatchEvent(new CustomEvent('pos-barcode-scanned', { detail: prod }));
+                navigate('/billing');
+              }}
+              onEdit={(prod) => {
+                setEditingProduct(prod);
+                setIsFormModalOpen(true);
+              }}
               onDelete={(prod) => setDeletingProduct(prod)}
             />
           ))}
         </div>
-      ) : (
-        <ProductTable
-          products={filteredProducts}
-          onAddToCart={(prod) => setActiveAddToCartProduct(prod)}
-          onEdit={(prod) => { setEditingProduct(prod); setIsFormModalOpen(true); }}
-          onDelete={(prod) => setDeletingProduct(prod)}
-        />
       )}
 
-      {/* Weight & Unit Quantity Modal */}
-      <AddToCartModal
-        isOpen={Boolean(activeAddToCartProduct)}
-        onClose={() => setActiveAddToCartProduct(null)}
-        product={activeAddToCartProduct}
-        onConfirm={({ product, quantity, calculatedTotal, unit }) => {
-          addItem(product, quantity, {
-            unit,
-            calculatedTotal,
-          });
-        }}
-      />
-
-      {/* Add / Edit Modal */}
+      {/* Add / Edit Product Modal */}
       <ProductFormModal
         isOpen={isFormModalOpen}
-        onClose={() => { setIsFormModalOpen(false); setEditingProduct(null); }}
+        onClose={() => {
+          setIsFormModalOpen(false);
+          setEditingProduct(null);
+        }}
         product={editingProduct}
-        onSave={saveProduct}
+        onSave={async (prodData) => {
+          await saveProduct(prodData);
+          setIsFormModalOpen(false);
+          setEditingProduct(null);
+          setFeedbackMessage(`پروڈکٹ "${prodData.name}" کامیابی سے محفوظ ہو گیا!`);
+          setTimeout(() => setFeedbackMessage(null), 3000);
+        }}
       />
 
       {/* Delete Confirmation Dialog */}
@@ -154,11 +205,13 @@ export const ProductsPage = () => {
           if (deletingProduct) {
             await deleteProduct(deletingProduct.id);
             setDeletingProduct(null);
+            setFeedbackMessage(`پروڈکٹ حذف کر دیا گیا۔`);
+            setTimeout(() => setFeedbackMessage(null), 3000);
           }
         }}
-        title="Delete Product?"
-        description={`Are you sure you want to remove "${deletingProduct?.name}" (${deletingProduct?.sku})? This cannot be undone.`}
-        confirmText="Yes, Delete Product"
+        title="پروڈکٹ حذف کریں؟"
+        description={`کیا آپ واقعی "${deletingProduct?.name}" (${deletingProduct?.sku}) کو سسٹم سے ہٹانا چاہتے ہیں؟`}
+        confirmText="ہاں، ڈیلیٹ کریں"
       />
     </div>
   );

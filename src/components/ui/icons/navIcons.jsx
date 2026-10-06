@@ -44,6 +44,16 @@ export const renderNavIcon = (name, iconProps) => {
           <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
         </svg>
       );
+    case 'billing':
+    case 'counter':
+      return (
+        <svg {...iconProps}>
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <line x1="7" x2="17" y1="8" y2="8" />
+          <line x1="7" x2="17" y1="12" y2="12" />
+          <line x1="7" x2="13" y1="16" y2="16" />
+        </svg>
+      );
     default:
       return null;
   }
