@@ -16,7 +16,18 @@ export const storageService = {
         localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
         return INITIAL_PRODUCTS;
       }
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) {
+        const enriched = parsed.map((p) => {
+          if (!p.unit) {
+            const initialMatch = INITIAL_PRODUCTS.find((init) => init.id === p.id);
+            return { ...p, unit: initialMatch?.unit || 'pcs' };
+          }
+          return p;
+        });
+        return enriched;
+      }
+      return INITIAL_PRODUCTS;
     } catch {
       return INITIAL_PRODUCTS;
     }

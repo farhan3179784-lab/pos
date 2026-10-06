@@ -13,21 +13,21 @@ export const calculateCartTotals = (items = [], taxRate = 8, discountRate = 0) =
   const subtotal = items.reduce((sum, item) => {
     const price = Number(item.price) || 0;
     const qty = Number(item.quantity) || 0;
-    return sum + price * qty;
+    return sum + (item.subtotal ? Number(item.subtotal) : price * qty);
   }, 0);
 
-  const totalItemCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+  const totalLinesCount = items.length;
   const discount = (subtotal * (Number(discountRate) || 0)) / 100;
   const taxableAmount = Math.max(0, subtotal - discount);
   const tax = (taxableAmount * (Number(taxRate) || 0)) / 100;
-  const grandTotal = taxableAmount + tax;
+  const grandTotal = Math.round(taxableAmount + tax);
 
   return {
-    subtotal: Math.round(subtotal * 100) / 100,
-    discount: Math.round(discount * 100) / 100,
-    tax: Math.round(tax * 100) / 100,
-    grandTotal: Math.round(grandTotal * 100) / 100,
-    totalItemCount,
+    subtotal: Math.round(subtotal),
+    discount: Math.round(discount),
+    tax: Math.round(tax),
+    grandTotal,
+    totalItemCount: totalLinesCount,
   };
 };
 

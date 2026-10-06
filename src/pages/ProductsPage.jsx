@@ -7,6 +7,7 @@ import { ProductCard } from '../features/products/components/ProductCard';
 import { ProductTable } from '../features/products/components/ProductTable';
 import { ProductFilters } from '../features/products/components/ProductFilters';
 import { ProductFormModal } from '../features/products/components/ProductFormModal';
+import { AddToCartModal } from '../features/products/components/AddToCartModal';
 import { useStore } from '../hooks/useStore';
 import { useCart } from '../hooks/useCart';
 import { calculateStockStatus } from '../utils/posCalculations';
@@ -24,6 +25,7 @@ export const ProductsPage = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletingProduct, setDeletingProduct] = useState(null);
+  const [activeAddToCartProduct, setActiveAddToCartProduct] = useState(null);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -108,7 +110,7 @@ export const ProductsPage = () => {
             <ProductCard
               key={product.id}
               product={product}
-              onAddToCart={addItem}
+              onAddToCart={(prod) => setActiveAddToCartProduct(prod)}
               onEdit={(prod) => { setEditingProduct(prod); setIsFormModalOpen(true); }}
               onDelete={(prod) => setDeletingProduct(prod)}
             />
@@ -117,11 +119,24 @@ export const ProductsPage = () => {
       ) : (
         <ProductTable
           products={filteredProducts}
-          onAddToCart={addItem}
+          onAddToCart={(prod) => setActiveAddToCartProduct(prod)}
           onEdit={(prod) => { setEditingProduct(prod); setIsFormModalOpen(true); }}
           onDelete={(prod) => setDeletingProduct(prod)}
         />
       )}
+
+      {/* Weight & Unit Quantity Modal */}
+      <AddToCartModal
+        isOpen={Boolean(activeAddToCartProduct)}
+        onClose={() => setActiveAddToCartProduct(null)}
+        product={activeAddToCartProduct}
+        onConfirm={({ product, quantity, calculatedTotal, unit }) => {
+          addItem(product, quantity, {
+            unit,
+            calculatedTotal,
+          });
+        }}
+      />
 
       {/* Add / Edit Modal */}
       <ProductFormModal

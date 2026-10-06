@@ -4,6 +4,11 @@ import { Icon } from '../../../components/ui/Icon';
 import { formatCurrency } from '../../../utils/currency';
 import { calculateStockStatus } from '../../../utils/posCalculations';
 import { STOCK_STATUS } from '../../../constants/stockStatus';
+import {
+  getUnitRateLabel,
+  formatUnitQuantity,
+  isWeightBasedUnit,
+} from '../../../constants/units';
 
 export const ProductTable = ({
   products = [],
@@ -20,7 +25,7 @@ export const ProductTable = ({
               <th className="py-3.5 px-4">Product</th>
               <th className="py-3.5 px-4">SKU</th>
               <th className="py-3.5 px-4">Category</th>
-              <th className="py-3.5 px-4">Price</th>
+              <th className="py-3.5 px-4">Rate (قیمت)</th>
               <th className="py-3.5 px-4">Stock</th>
               <th className="py-3.5 px-4">Status</th>
               <th className="py-3.5 px-4 text-right">Actions</th>
@@ -35,7 +40,8 @@ export const ProductTable = ({
                   : statusKey === 'low_stock'
                   ? STOCK_STATUS.LOW_STOCK
                   : STOCK_STATUS.IN_STOCK;
-              const isOutOfStock = product.stock <= 0;
+              const isOutOfStock = Number(product.stock) <= 0;
+              const isWeight = isWeightBasedUnit(product.unit);
 
               return (
                 <tr
@@ -59,7 +65,9 @@ export const ProductTable = ({
                           {product.name}
                         </h4>
                         {product.nameUrdu && (
-                          <span className="text-xs font-bold text-slate-600 font-urdu block">{product.nameUrdu}</span>
+                          <span className="text-xs font-bold text-slate-600 font-urdu block">
+                            {product.nameUrdu}
+                          </span>
                         )}
                         <p className="text-[11px] text-slate-400 line-clamp-1">{product.description}</p>
                       </div>
@@ -73,17 +81,25 @@ export const ProductTable = ({
 
                   {/* Category */}
                   <td className="py-3 px-4 text-slate-700 font-medium">
-                    {product.category}
+                    <div className="flex items-center gap-1.5">
+                      <span>{product.category}</span>
+                      <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1 py-0.5 rounded uppercase">
+                        {product.unit || 'pcs'}
+                      </span>
+                    </div>
                   </td>
 
                   {/* Price */}
                   <td className="py-3 px-4 font-bold text-slate-900 text-sm">
                     {formatCurrency(product.price)}
+                    <span className="text-[11px] font-normal text-slate-500 ml-1">
+                      {getUnitRateLabel(product.unit)}
+                    </span>
                   </td>
 
                   {/* Stock */}
                   <td className="py-3 px-4 font-semibold text-slate-800">
-                    {product.stock} units
+                    {formatUnitQuantity(product.stock, product.unit)}
                   </td>
 
                   {/* Status Badge */}
@@ -99,11 +115,11 @@ export const ProductTable = ({
                       <Button
                         variant={isOutOfStock ? 'secondary' : 'primary'}
                         size="xs"
-                        icon="cart"
+                        icon={isWeight ? 'scale' : 'cart'}
                         disabled={isOutOfStock}
                         onClick={() => onAddToCart(product)}
                       >
-                        {isOutOfStock ? 'Sold Out' : 'Add'}
+                        {isOutOfStock ? 'Sold Out' : isWeight ? 'Weight' : 'Add'}
                       </Button>
                       <button
                         type="button"

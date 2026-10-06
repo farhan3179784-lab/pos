@@ -6,6 +6,7 @@ import { UrduReceipt } from '../../../components/common/UrduReceipt';
 import { formatCurrency } from '../../../utils/currency';
 import { formatDateTime } from '../../../utils/date';
 import { ORDER_STATUS } from '../../../constants/orderStatus';
+import { formatUnitQuantity } from '../../../constants/units';
 
 export const OrderDetailsDrawer = ({ isOpen, onClose, order }) => {
   const [activeTab, setActiveTab] = useState('summary'); // 'summary' | 'receipt'
@@ -113,7 +114,7 @@ export const OrderDetailsDrawer = ({ isOpen, onClose, order }) => {
                         <p className="text-[11px] font-urdu text-slate-500">{item.nameUrdu}</p>
                       )}
                       <span className="text-slate-500 text-[11px]">
-                        {formatCurrency(item.price)} &times; {item.quantity}
+                        {formatCurrency(item.price)} &times; {formatUnitQuantity(item.quantity, item.unit || 'pcs')}
                       </span>
                     </div>
                     <span className="font-bold text-slate-900 shrink-0">

@@ -46,8 +46,8 @@ export const orderService = {
         items.forEach((item) => {
           const idx = products.findIndex((p) => p.id === (item.productId || item.id));
           if (idx !== -1) {
-            const prev = products[idx].stock;
-            const updatedStock = prev - item.quantity;
+            const prev = Number(products[idx].stock) || 0;
+            const updatedStock = Math.max(0, Math.round((prev - item.quantity) * 1000) / 1000);
             products[idx] = { ...products[idx], stock: updatedStock };
 
             newLogs.push({

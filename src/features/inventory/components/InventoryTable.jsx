@@ -2,6 +2,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { calculateStockStatus } from '../../../utils/posCalculations';
 import { STOCK_STATUS } from '../../../constants/stockStatus';
+import { formatUnitQuantity } from '../../../constants/units';
 
 export const InventoryTable = ({ products = [], onAdjustStock }) => {
   return (
@@ -56,19 +57,19 @@ export const InventoryTable = ({ products = [], onAdjustStock }) => {
                   <td className="py-3 px-4">
                     <span
                       className={`text-sm font-extrabold ${
-                        product.stock <= 0
+                        Number(product.stock) <= 0
                           ? 'text-rose-600'
-                          : product.stock <= product.threshold
+                          : Number(product.stock) <= Number(product.threshold)
                           ? 'text-amber-600'
                           : 'text-slate-800'
                       }`}
                     >
-                      {product.stock} units
+                      {formatUnitQuantity(product.stock, product.unit)}
                     </span>
                   </td>
 
                   <td className="py-3 px-4 text-slate-500 font-medium">
-                    {product.threshold || 10} units
+                    {formatUnitQuantity(product.threshold || 10, product.unit)}
                   </td>
 
                   <td className="py-3 px-4">

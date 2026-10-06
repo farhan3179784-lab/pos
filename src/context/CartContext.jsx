@@ -23,10 +23,12 @@ export const CartProvider = ({ children }) => {
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
-  // Add Item with strict stock check
-  const addItem = (product, quantityToAdd = 1) => {
+  // Add Item with strict stock check and unit awareness
+  const addItem = (product, quantityToAdd = 1, options = {}) => {
     const liveProduct = products.find((p) => p.id === product.id) || product;
-    const availableStock = liveProduct.stock ?? 0;
+    const availableStock = Number(liveProduct.stock) || 0;
+    const unit = options.unit || product.unit || 'pcs';
+    const numQtyToAdd = Math.round(Number(quantityToAdd) * 1000) / 1000;
 
     if (availableStock <= 0) {
       alert(`"${liveProduct.name}" is currently out of stock.`);
@@ -38,25 +40,38 @@ export const CartProvider = ({ children }) => {
 
       if (existingIndex > -1) {
         const currentQty = prevItems[existingIndex].quantity;
-        const newQty = currentQty + quantityToAdd;
+        const newQty = options.replaceQuantity
+          ? numQtyToAdd
+          : Math.round((currentQty + numQtyToAdd) * 1000) / 1000;
 
         if (newQty > availableStock) {
-          alert(`Cannot add more. Only ${availableStock} units available in stock.`);
+          alert(`Cannot add more. Only ${availableStock} ${unit} available in stock.`);
           return prevItems;
         }
+
+        const price = Number(prevItems[existingIndex].price) || 0;
+        const subtotal = options.calculatedTotal !== undefined
+          ? options.calculatedTotal
+          : Math.round(newQty * price);
 
         const updated = [...prevItems];
         updated[existingIndex] = {
           ...updated[existingIndex],
           quantity: newQty,
-          subtotal: Math.round(newQty * updated[existingIndex].price * 100) / 100,
+          unit,
+          subtotal,
         };
         return updated;
       } else {
-        if (quantityToAdd > availableStock) {
-          alert(`Cannot add ${quantityToAdd}. Only ${availableStock} units available.`);
+        if (numQtyToAdd > availableStock) {
+          alert(`Cannot add ${numQtyToAdd} ${unit}. Only ${availableStock} available.`);
           return prevItems;
         }
+
+        const price = Number(product.price) || 0;
+        const subtotal = options.calculatedTotal !== undefined
+          ? options.calculatedTotal
+          : Math.round(numQtyToAdd * price);
 
         return [
           ...prevItems,
@@ -67,9 +82,10 @@ export const CartProvider = ({ children }) => {
             nameUrdu: product.nameUrdu || product.name,
             sku: product.sku,
             category: product.category,
-            price: Number(product.price) || 0,
-            quantity: quantityToAdd,
-            subtotal: Math.round(Number(product.price) * quantityToAdd * 100) / 100,
+            unit,
+            price,
+            quantity: numQtyToAdd,
+            subtotal,
             image: product.image,
             maxStock: availableStock,
           },
@@ -81,18 +97,19 @@ export const CartProvider = ({ children }) => {
     return true;
   };
 
-  // Update item quantity
+  // Update item quantity (supports decimals/weights)
   const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity <= 0) {
+    const cleanQty = Math.round(Number(newQuantity) * 1000) / 1000;
+    if (cleanQty <= 0) {
       removeItem(productId);
       return;
     }
 
     const liveProduct = products.find((p) => p.id === productId);
-    const availableStock = liveProduct ? liveProduct.stock : 999;
+    const availableStock = liveProduct ? Number(liveProduct.stock) : 999;
 
-    if (newQuantity > availableStock) {
-      alert(`Cannot set quantity to ${newQuantity}. Only ${availableStock} available in stock.`);
+    if (cleanQty > availableStock) {
+      alert(`Cannot set quantity to ${cleanQty}. Only ${availableStock} available in stock.`);
       return;
     }
 
@@ -101,8 +118,8 @@ export const CartProvider = ({ children }) => {
         if (item.id === productId) {
           return {
             ...item,
-            quantity: newQuantity,
-            subtotal: Math.round(newQuantity * item.price * 100) / 100,
+            quantity: cleanQty,
+            subtotal: Math.round(cleanQty * item.price),
           };
         }
         return item;
@@ -132,6 +149,7 @@ export const CartProvider = ({ children }) => {
           nameUrdu: it.nameUrdu || it.name,
           sku: it.sku,
           category: it.category,
+          unit: it.unit || 'pcs',
           price: it.price,
           quantity: it.quantity,
           subtotal: it.subtotal,

@@ -4,8 +4,13 @@ import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
 import { PRODUCT_CATEGORIES } from '../../../constants/categories';
+import { UNIT_OPTIONS, STANDARD_UNITS } from '../../../constants/units';
 
 const categoriesList = PRODUCT_CATEGORIES.filter((c) => c !== 'All Categories');
+const unitSelectOptions = UNIT_OPTIONS.map((u) => ({
+  value: u.key,
+  label: `${u.label} • ${u.urdu}`,
+}));
 
 const ProductFormContent = ({ product, onSave, onClose }) => {
   const isEditing = Boolean(product?.id);
@@ -16,6 +21,7 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
     nameUrdu: product?.nameUrdu || '',
     sku: product?.sku || '',
     category: product?.category || categoriesList[0] || 'Bakery & Snacks',
+    unit: product?.unit || 'kg',
     price: product?.price ?? '',
     stock: product?.stock ?? '',
     threshold: product?.threshold ?? '10',
@@ -49,6 +55,7 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
       setIsSubmitting(true);
       await onSave({
         ...formData,
+        unit: formData.unit || 'pcs',
         price: Number(formData.price),
         stock: Number(formData.stock),
         threshold: Number(formData.threshold) || 10,
@@ -61,6 +68,8 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
       setIsSubmitting(false);
     }
   };
+
+  const currentUnitConfig = STANDARD_UNITS[formData.unit] || STANDARD_UNITS.pcs;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -84,13 +93,20 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Select
           label="Category"
           name="category"
           value={formData.category}
           onChange={handleChange}
           options={categoriesList}
+        />
+        <Select
+          label="Standard Unit (اکائی)"
+          name="unit"
+          value={formData.unit}
+          onChange={handleChange}
+          options={unitSelectOptions}
         />
         <Input
           label="Custom SKU (Optional)"
@@ -103,7 +119,7 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Input
-          label="Price (Rs.)"
+          label={`Price per ${currentUnitConfig.short} (Rs.)`}
           name="price"
           type="number"
           step="1"
@@ -115,9 +131,10 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
           required
         />
         <Input
-          label="Initial Stock"
+          label={`Initial Stock (${currentUnitConfig.short})`}
           name="stock"
           type="number"
+          step={currentUnitConfig.defaultStep || '0.1'}
           min="0"
           value={formData.stock}
           onChange={handleChange}
@@ -126,10 +143,11 @@ const ProductFormContent = ({ product, onSave, onClose }) => {
           required
         />
         <Input
-          label="Low Threshold"
+          label={`Low Alert (${currentUnitConfig.short})`}
           name="threshold"
           type="number"
-          min="1"
+          step={currentUnitConfig.defaultStep || '1'}
+          min="0.1"
           value={formData.threshold}
           onChange={handleChange}
           placeholder="10"
@@ -170,7 +188,7 @@ export const ProductFormModal = ({
       onClose={onClose}
       title={isEditing ? 'Edit Product' : 'Add New Product'}
       subtitle={isEditing ? `Update details for SKU: ${product?.sku}` : 'Fill in catalog information'}
-      maxWidth="max-w-lg"
+      maxWidth="max-w-xl"
     >
       {isOpen && (
         <ProductFormContent
