@@ -23,15 +23,21 @@ export const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
   return (
     <div className="flex items-center gap-3 py-3 border-b border-slate-100 last:border-0 group">
-      {/* Product Image */}
-      <img
-        src={item.image}
-        alt={item.name}
-        className="w-14 h-14 object-cover rounded-xl border border-slate-100 shrink-0 bg-slate-100"
-        onError={(e) => {
-          e.target.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&auto=format&fit=crop&q=80';
-        }}
-      />
+      {/* Product Image / Icon Avatar */}
+      {item.image ? (
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-12 h-12 object-cover rounded-xl border border-slate-100 shrink-0 bg-slate-100"
+          onError={(e) => {
+            e.target.style.display = 'none';
+          }}
+        />
+      ) : (
+        <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 text-indigo-300 flex items-center justify-center font-bold text-xs shrink-0 font-mono shadow-xs">
+          <Icon name="barcode" size={18} />
+        </div>
+      )}
 
       {/* Info */}
       <div className="flex-1 min-w-0">

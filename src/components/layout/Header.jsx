@@ -3,7 +3,7 @@ import { Icon } from '../ui/Icon';
 import { useCart } from '../../hooks/useCart';
 import { formatTime, formatDate } from '../../utils/date';
 
-export const Header = ({ onOpenMobileMenu }) => {
+export const Header = ({ onOpenMobileMenu, onOpenScanner }) => {
   const { totals, openCart } = useCart();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -35,23 +35,44 @@ export const Header = ({ onOpenMobileMenu }) => {
       </div>
 
       {/* Right: Quick actions & Cart Drawer Trigger */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Barcode Scanner Trigger Button */}
+        <button
+          type="button"
+          onClick={onOpenScanner}
+          className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 border border-slate-700"
+          title="Open Barcode Scanner (بار کوڈ اسکینر - Ctrl+B)"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <Icon name="barcode" size={16} />
+          <span className="hidden sm:inline">اسکینر (Scan)</span>
+        </button>
+
         {/* Terminal Quick Alert Indicator */}
-        <div className="hidden md:flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-[11px] text-slate-600 font-medium">
-          <span className="text-slate-400 mr-1.5">Tax Rate:</span> 8%
+        <div className="hidden lg:flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-[11px] text-slate-600 font-medium">
+          <span className="text-slate-400 mr-1.5">Tax:</span> 8%
         </div>
 
         {/* Cart Trigger Button */}
         <button
           type="button"
           onClick={openCart}
-          className="relative flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border border-indigo-200/60 shadow-xs cursor-pointer active:scale-95"
-          title="Open POS Cart"
+          className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shadow-xs cursor-pointer active:scale-95 ${
+            totals.totalItemCount > 0
+              ? 'bg-indigo-600 text-white border-indigo-700 shadow-indigo-500/20 hover:bg-indigo-700'
+              : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200/60'
+          }`}
+          title="Open POS Cart (کارٹ اور بل دیکھیں)"
         >
           <Icon name="cart" size={18} />
-          <span className="hidden sm:inline">Cart</span>
+          <span className="hidden sm:inline">
+            {totals.totalItemCount > 0 ? 'کارٹ دیکھیں' : 'Cart'}
+          </span>
           {totals.totalItemCount > 0 && (
-            <span className="h-5 min-w-5 px-1 bg-indigo-600 text-white rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-xs">
+            <span className="h-5 min-w-5 px-1 bg-white text-indigo-700 rounded-full text-[11px] font-black flex items-center justify-center shadow-xs">
               {totals.totalItemCount}
             </span>
           )}

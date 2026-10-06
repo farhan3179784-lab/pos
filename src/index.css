@@ -69,3 +69,47 @@
     margin: 2mm;
   }
 }
+
+/* POS Barcode Scanner Single-Camera Viewport Rules */
+#pos-barcode-viewport {
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  background-color: #020617 !important;
+}
+
+#pos-barcode-viewport canvas {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+#pos-barcode-viewport video {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 380px !important;
+  object-fit: cover !important;
+  margin: 0 auto !important;
+}
+
+#pos-barcode-viewport > div {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+#pos-barcode-viewport [style*="rgba(9, 9, 9, 0.46)"],
+#pos-barcode-viewport [style*="rgba(9, 9, 9"],
+#pos-barcode-viewport [style*="FFECEC"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+

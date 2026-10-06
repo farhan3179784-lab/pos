@@ -3,9 +3,9 @@ import { INITIAL_ORDERS } from '../data/mock/mockOrders';
 import { INITIAL_INVENTORY_LOGS } from '../data/mock/mockInventory';
 
 const STORAGE_KEYS = {
-  PRODUCTS: 'superstore_pos_products_v2',
-  ORDERS: 'superstore_pos_orders_v2',
-  INVENTORY_LOGS: 'superstore_pos_inventory_logs_v2',
+  PRODUCTS: 'superstore_pos_products_v3', // new clean key
+  ORDERS: 'superstore_pos_orders_v3',
+  INVENTORY_LOGS: 'superstore_pos_inventory_logs_v3',
 };
 
 export const storageService = {
@@ -13,29 +13,38 @@ export const storageService = {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
       if (!data) {
-        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
-        return INITIAL_PRODUCTS;
+        // Also check if user had previously created custom products in v2
+        const oldData = localStorage.getItem('superstore_pos_products_v2');
+        if (oldData) {
+          const parsedOld = JSON.parse(oldData);
+          if (Array.isArray(parsedOld)) {
+            // Keep only products that are NOT mock products
+            const customOnly = parsedOld.filter(
+              (p) => !p.id?.startsWith('prod_10') && p.name && p.price
+            );
+            localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(customOnly));
+            return customOnly;
+          }
+        }
+        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify([]));
+        return [];
       }
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed)) {
-        const enriched = parsed.map((p) => {
-          if (!p.unit) {
-            const initialMatch = INITIAL_PRODUCTS.find((init) => init.id === p.id);
-            return { ...p, unit: initialMatch?.unit || 'pcs' };
-          }
-          return p;
-        });
-        return enriched;
+        return parsed.filter((p) => !p.id?.startsWith('prod_10'));
       }
-      return INITIAL_PRODUCTS;
+      return [];
     } catch {
-      return INITIAL_PRODUCTS;
+      return [];
     }
   },
 
   setProducts(products) {
     try {
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+      const clean = Array.isArray(products)
+        ? products.filter((p) => !p.id?.startsWith('prod_10'))
+        : [];
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(clean));
     } catch (e) {
       console.error('Failed to save products to localStorage', e);
     }
@@ -45,12 +54,12 @@ export const storageService = {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ORDERS);
       if (!data) {
-        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-        return INITIAL_ORDERS;
+        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify([]));
+        return [];
       }
       return JSON.parse(data);
     } catch {
-      return INITIAL_ORDERS;
+      return [];
     }
   },
 
@@ -66,12 +75,12 @@ export const storageService = {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.INVENTORY_LOGS);
       if (!data) {
-        localStorage.setItem(STORAGE_KEYS.INVENTORY_LOGS, JSON.stringify(INITIAL_INVENTORY_LOGS));
-        return INITIAL_INVENTORY_LOGS;
+        localStorage.setItem(STORAGE_KEYS.INVENTORY_LOGS, JSON.stringify([]));
+        return [];
       }
       return JSON.parse(data);
     } catch {
-      return INITIAL_INVENTORY_LOGS;
+      return [];
     }
   },
 

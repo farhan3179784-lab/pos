@@ -93,7 +93,9 @@ export const CartProvider = ({ children }) => {
       }
     });
 
-    setIsOpen(true);
+    if (options.openCart === true) {
+      setIsOpen(true);
+    }
     return true;
   };
 

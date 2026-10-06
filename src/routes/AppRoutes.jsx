@@ -1,20 +1,16 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '../components/layout/AdminLayout';
-import { DashboardPage } from '../pages/DashboardPage';
+import { BillingPage } from '../pages/BillingPage';
 import { ProductsPage } from '../pages/ProductsPage';
-import { InventoryPage } from '../pages/InventoryPage';
-import { OrdersPage } from '../pages/OrdersPage';
-import { NotFoundPage } from '../pages/NotFoundPage';
 
 export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLayout />}>
-        <Route index element={<DashboardPage />} />
+        <Route index element={<BillingPage />} />
+        <Route path="billing" element={<BillingPage />} />
         <Route path="products" element={<ProductsPage />} />
-        <Route path="inventory" element={<InventoryPage />} />
-        <Route path="orders" element={<OrdersPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={<Navigate to="/billing" replace />} />
       </Route>
     </Routes>
   );

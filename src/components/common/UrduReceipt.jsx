@@ -67,7 +67,7 @@ export const UrduReceipt = ({
                 {item.nameUrdu || item.name}
               </td>
               <td className="py-1.5 px-0.5 font-sans font-bold text-center text-[11px] whitespace-nowrap">
-                {formatUnitQuantity(item.quantity, item.unit || 'pcs')}
+                {formatUnitQuantity(item.quantity, item.unit || 'pcs', true)}
               </td>
               <td className="py-1.5 px-0.5 font-sans font-semibold text-center text-[11px]">
                 {Math.round(Number(item.price))}
