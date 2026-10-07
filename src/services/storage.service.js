@@ -3,50 +3,82 @@ import { INITIAL_ORDERS } from '../data/mock/mockOrders';
 import { INITIAL_INVENTORY_LOGS } from '../data/mock/mockInventory';
 
 const STORAGE_KEYS = {
-  PRODUCTS: 'superstore_pos_products_v3', // new clean key
-  ORDERS: 'superstore_pos_orders_v3',
-  INVENTORY_LOGS: 'superstore_pos_inventory_logs_v3',
+  PRODUCTS: 'fusion_pos_products_v4',
+  ORDERS: 'fusion_pos_orders_v4',
+  INVENTORY_LOGS: 'fusion_pos_inventory_logs_v4',
+  INITIALIZED: 'fusion_pos_initialized_v4',
 };
 
 export const storageService = {
   getProducts() {
     try {
+      const isInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
       const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      if (!data) {
-        // Also check if user had previously created custom products in v2
-        const oldData = localStorage.getItem('superstore_pos_products_v2');
-        if (oldData) {
-          const parsedOld = JSON.parse(oldData);
-          if (Array.isArray(parsedOld)) {
-            // Keep only products that are NOT mock products
-            const customOnly = parsedOld.filter(
-              (p) => !p.id?.startsWith('prod_10') && p.name && p.price
-            );
-            localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(customOnly));
-            return customOnly;
+
+      if (!isInitialized || !data) {
+        // Also check if user had previously created custom products in v2 or v3
+        let existingCustom = [];
+        const prevData =
+          localStorage.getItem('superstore_pos_products_v3') ||
+          localStorage.getItem('superstore_pos_products_v2');
+
+        if (prevData) {
+          try {
+            const parsedOld = JSON.parse(prevData);
+            if (Array.isArray(parsedOld) && parsedOld.length > 0) {
+              existingCustom = parsedOld;
+            }
+          } catch {
+            // ignore
           }
         }
-        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify([]));
-        return [];
+
+        // If user already has custom products, preserve them; otherwise use INITIAL_PRODUCTS
+        const finalProducts =
+          existingCustom.length > 0 ? existingCustom : INITIAL_PRODUCTS;
+
+        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(finalProducts));
+        localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
+        return finalProducts;
       }
+
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed)) {
-        return parsed.filter((p) => !p.id?.startsWith('prod_10'));
+        // If parsed is empty, ensure the user has products available on fresh deployment
+        if (parsed.length === 0 && !localStorage.getItem('fusion_pos_cleared_by_user')) {
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+          return INITIAL_PRODUCTS;
+        }
+        return parsed;
       }
-      return [];
-    } catch {
-      return [];
+      return INITIAL_PRODUCTS;
+    } catch (e) {
+      console.error('Error reading products from storage:', e);
+      return INITIAL_PRODUCTS;
     }
   },
 
   setProducts(products) {
     try {
-      const clean = Array.isArray(products)
-        ? products.filter((p) => !p.id?.startsWith('prod_10'))
-        : [];
+      const clean = Array.isArray(products) ? products : [];
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(clean));
+      if (clean.length === 0) {
+        localStorage.setItem('fusion_pos_cleared_by_user', 'true');
+      } else {
+        localStorage.removeItem('fusion_pos_cleared_by_user');
+      }
     } catch (e) {
       console.error('Failed to save products to localStorage', e);
+    }
+  },
+
+  resetToDefaultProducts() {
+    try {
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+      localStorage.removeItem('fusion_pos_cleared_by_user');
+      return INITIAL_PRODUCTS;
+    } catch {
+      return INITIAL_PRODUCTS;
     }
   },
 

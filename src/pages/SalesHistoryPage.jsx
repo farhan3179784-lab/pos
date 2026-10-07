@@ -9,6 +9,7 @@ import { SalesTable } from '../features/sales/components/SalesTable';
 import { ProductSalesSummaryTable } from '../features/sales/components/ProductSalesSummaryTable';
 import { OrderDetailModal } from '../features/sales/components/OrderDetailModal';
 import { ProductSalesModal } from '../features/sales/components/ProductSalesModal';
+import { matchesProduct } from '../utils/searchMatcher';
 
 export const SalesHistoryPage = () => {
   const navigate = useNavigate();
@@ -175,16 +176,9 @@ export const SalesHistoryPage = () => {
     const list = Object.values(map);
 
     // Apply search filter
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim();
     const filtered = q
-      ? list.filter(
-          (p) =>
-            p.name.toLowerCase().includes(q) ||
-            (p.nameUrdu && p.nameUrdu.includes(q)) ||
-            (p.sku && p.sku.toLowerCase().includes(q)) ||
-            (p.barcode && p.barcode.toLowerCase().includes(q)) ||
-            (p.category && p.category.toLowerCase().includes(q))
-        )
+      ? list.filter((p) => matchesProduct(p, q))
       : list;
 
     // Sort by highest quantity sold first

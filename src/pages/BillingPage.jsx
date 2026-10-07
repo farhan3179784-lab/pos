@@ -11,9 +11,11 @@ import { playScanSuccessBeep, playScanErrorBeep } from '../utils/soundEffects';
 import { useBarcodeScanner } from '../hooks/useBarcodeScanner';
 import { generateOrderId } from '../utils/idGenerator';
 
+import { matchesProduct } from '../utils/searchMatcher';
+
 export const BillingPage = () => {
   const navigate = useNavigate();
-  const { products, isLoading, createOrder, saveProduct } = useStore();
+  const { products, isLoading, createOrder, saveProduct, resetProducts } = useStore();
 
   // State for current bill
   const [billItems, setBillItems] = useState([]);
@@ -39,18 +41,9 @@ export const BillingPage = () => {
 
   // Filter matching products for live search dropdown in billing
   const searchResults = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim();
     if (!q) return [];
-    return products
-      .filter((p) => {
-        return (
-          p.name.toLowerCase().includes(q) ||
-          (p.nameUrdu && p.nameUrdu.includes(q)) ||
-          (p.barcode && p.barcode.toLowerCase() === q) ||
-          (p.sku && p.sku.toLowerCase() === q)
-        );
-      })
-      .slice(0, 8);
+    return products.filter((p) => matchesProduct(p, q)).slice(0, 10);
   }, [products, searchQuery]);
 
   // Add product to bill helper
@@ -145,11 +138,13 @@ export const BillingPage = () => {
     const query = searchQuery.trim();
     if (!query) return;
 
-    // 1. Try exact barcode/SKU match first
+    // 1. Try exact barcode/SKU/name match first
     const exactMatch = products.find(
       (p) =>
-        (p.barcode && p.barcode.toLowerCase() === query.toLowerCase()) ||
-        (p.sku && p.sku.toLowerCase() === query.toLowerCase())
+        (p.barcode && String(p.barcode).trim().toLowerCase() === query.toLowerCase()) ||
+        (p.sku && String(p.sku).trim().toLowerCase() === query.toLowerCase()) ||
+        (p.name && p.name.trim().toLowerCase() === query.toLowerCase()) ||
+        (p.nameUrdu && p.nameUrdu.trim() === query)
     );
 
     if (exactMatch) {
@@ -160,17 +155,15 @@ export const BillingPage = () => {
     // 2. Pick first matching result if available
     if (searchResults.length > 0) {
       handleAddProductToBill(searchResults[0]);
-    } else {
-      // If it looks like a barcode number (digits), prompt quick register!
-      if (/^\d{4,}$/.test(query)) {
-        playScanSuccessBeep();
-        setUnregisteredBarcode(query);
-        setQuickName('');
-        setQuickPrice('');
-      } else {
-        playScanErrorBeep();
-      }
+      return;
     }
+
+    // 3. Prompt quick register if not found
+    playScanSuccessBeep();
+    const isNum = /^\d+$/.test(query);
+    setUnregisteredBarcode(isNum ? query : `896${Date.now().toString().slice(-8)}`);
+    setQuickName(isNum ? '' : query);
+    setQuickPrice('');
   };
 
   // Quick save unregistered scanned product
@@ -379,6 +372,25 @@ export const BillingPage = () => {
         </div>
 
         <div className="p-4 sm:p-6 space-y-6">
+          {products.length === 0 && (
+            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-950 text-xs sm:text-sm font-bold shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">📦</span>
+                <div>
+                  <p className="font-black text-slate-900">سسٹم میں ابھی پروڈکٹس لوڈ نہیں ہیں</p>
+                  <p className="text-slate-600 font-normal text-xs">ایک کلک سے فیوژن کریانہ کے تمام آئٹمز (چینی، گھی، چاول، دالیں، چائے، وغیرہ) لوڈ کریں۔</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => resetProducts?.()}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs sm:text-sm transition-all shadow-xs cursor-pointer active:scale-95 shrink-0"
+              >
+                + کریانہ پروڈکٹس لوڈ کریں (Load Products)
+              </button>
+            </div>
+          )}
+
           {/* SEARCH & BARCODE INPUT BAR */}
           <div className="relative">
             <form onSubmit={handleSearchSubmit} className="flex gap-2.5">
@@ -424,46 +436,71 @@ export const BillingPage = () => {
             </form>
 
             {/* Live Autocomplete Dropdown */}
-            {searchResults.length > 0 && (
+            {searchQuery.trim().length > 0 && (
               <div className="absolute z-30 top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden divide-y divide-slate-100 max-h-80 overflow-y-auto">
-                {searchResults.map((product) => (
-                  <button
-                    key={product.id}
-                    type="button"
-                    onClick={() => handleAddProductToBill(product)}
-                    className="w-full text-left p-3.5 hover:bg-indigo-50/80 transition-colors flex items-center justify-between gap-3 group cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="h-10 w-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold shrink-0">
-                        <Icon name="barcode" size={20} />
-                      </div>
-                      <div className="truncate">
-                        <p className="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-indigo-900 truncate">
-                          {product.name}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mt-0.5">
-                          {product.nameUrdu && (
-                            <span className="font-urdu font-bold text-slate-700">
-                              {product.nameUrdu}
+                {searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => handleAddProductToBill(product)}
+                      className="w-full text-left p-3.5 hover:bg-indigo-50/80 transition-colors flex items-center justify-between gap-3 group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="h-10 w-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold shrink-0">
+                          <Icon name="barcode" size={20} />
+                        </div>
+                        <div className="truncate">
+                          <p className="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-indigo-900 truncate">
+                            {product.name}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mt-0.5">
+                            {product.nameUrdu && (
+                              <span className="font-urdu font-bold text-slate-700">
+                                {product.nameUrdu}
+                              </span>
+                            )}
+                            <span>•</span>
+                            <span className="font-mono text-slate-400">
+                              {product.barcode || product.sku}
                             </span>
-                          )}
-                          <span>•</span>
-                          <span className="font-mono text-slate-400">
-                            {product.barcode || product.sku}
-                          </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm sm:text-base font-black text-slate-950">
-                        {formatCurrency(product.price)}
-                      </p>
-                      <p className="text-xs text-slate-500 font-semibold">
-                        اسٹاک: {product.stock} {product.unit}
-                      </p>
-                    </div>
-                  </button>
-                ))}
+                      <div className="text-right shrink-0">
+                        <p className="text-sm sm:text-base font-black text-slate-950">
+                          {formatCurrency(product.price)}
+                        </p>
+                        <p className="text-xs text-slate-500 font-semibold">
+                          اسٹاک: {product.stock} {product.unit}
+                        </p>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-4 sm:p-5 text-center bg-slate-50">
+                    <p className="text-sm font-bold text-slate-700">
+                      "{searchQuery}" سے ملتا جلتا کوئی پروڈکٹ نہیں ملا
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      آپ اس پروڈکٹ کو فوری رجسٹر کر کے بل میں شامل کر سکتے ہیں:
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const q = searchQuery.trim();
+                        const isNum = /^\d+$/.test(q);
+                        setUnregisteredBarcode(isNum ? q : `896${Date.now().toString().slice(-8)}`);
+                        setQuickName(isNum ? '' : q);
+                        setQuickPrice('');
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-black transition-colors cursor-pointer shadow-xs active:scale-95"
+                    >
+                      <Icon name="add" size={16} />
+                      <span>+ فوری نیا پروڈکٹ شامل کریں (Quick Add)</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

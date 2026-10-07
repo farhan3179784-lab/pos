@@ -60,6 +60,12 @@ export const StoreProvider = ({ children }) => {
     return order;
   };
 
+  // Reset / reload default products
+  const resetProducts = async () => {
+    storageService.resetToDefaultProducts();
+    await loadData();
+  };
+
   return (
     <StoreContext.Provider
       value={{
@@ -73,6 +79,7 @@ export const StoreProvider = ({ children }) => {
         deleteProduct,
         adjustStock,
         createOrder,
+        resetProducts,
       }}
     >
       {children}
