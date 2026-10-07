@@ -24,20 +24,22 @@ export const AdminLayout = () => {
           {/* Left: Brand & Status */}
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-lg shadow-sm shadow-indigo-200 shrink-0">
-              S
+              F
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-base font-black text-slate-900 tracking-tight">
-                  SUPER STORE POS
+                  FUSION KIRYANA
                 </span>
-                <span className="text-sm font-bold font-urdu text-indigo-700">
-                  سپر اسٹور
+                <span className="text-sm font-extrabold font-urdu text-indigo-700">
+                  فیوژن کریانہ ہول سیل سنٹر
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-semibold text-slate-700">آن لائن کاؤنٹر</span>
+                <span className="hidden sm:inline text-slate-300">•</span>
+                <span className="hidden sm:inline text-slate-500 font-urdu text-[11px]">رجانہ روڈ کھدروالا</span>
                 <span>•</span>
                 <span>{formatDate(currentDateTime)}</span>
                 <span className="font-mono text-slate-400">({formatTime(currentDateTime)})</span>

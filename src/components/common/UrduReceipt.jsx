@@ -3,12 +3,15 @@ import { formatUnitQuantity } from '../../constants/units';
 
 export const UrduReceipt = ({
   order,
-  storeName = 'چوہدری کریانہ ہول سیل سنٹر',
-  storeAddress = 'رجانہ روڈ کھدروال نزد سبزی منڈی',
-  phone1 = 'Phone # M khalid youns 03427910641',
-  phone2 = '03082208205',
-  footerNote = 'Thank you For Visiting !',
-  softwareCredit = 'Software developed by KeyPos +92 330 70 1 70 70',
+  storeName = 'فیوژن کریانہ ہول سیل سنٹر',
+  storeSubName = 'FUSION KIRYANA STORE',
+  storeAddress = 'رجانہ روڈ نزد الائیڈ پیٹرولیم کھدروالا',
+  phone1 = '0302-1322203',
+  phone2 = '0342-3989203',
+  proprietor1 = 'عبدالرزاق',
+  proprietor2 = 'محمد علی',
+  footerNote = 'Thank you For Visiting ! شکریہ تشریف آوری کا',
+  softwareCredit = 'Developed by CodesInc • 0307-3493100',
 }) => {
   if (!order) return null;
 
@@ -27,15 +30,22 @@ export const UrduReceipt = ({
         <h2 className="text-xl font-extrabold tracking-normal leading-tight font-urdu">
           {storeName}
         </h2>
+        {storeSubName && (
+          <p className="text-[10px] font-sans font-bold tracking-widest text-slate-800 mt-0.5 uppercase">
+            {storeSubName}
+          </p>
+        )}
         <p className="text-[12px] font-urdu font-medium text-slate-800 mt-1">
           {storeAddress}
         </p>
-        <p className="text-[11px] font-sans font-medium mt-1 tracking-tight text-slate-800">
-          {phone1}
-        </p>
-        <p className="text-[11px] font-sans font-medium tracking-tight text-slate-800">
-          {phone2}
-        </p>
+        <div className="mt-1.5 space-y-0.5 text-[11px] text-slate-800">
+          <p className="font-urdu">
+            پروپرائیٹر {proprietor1}: <span className="font-mono font-bold" dir="ltr">{phone1}</span>
+          </p>
+          <p className="font-urdu">
+            {proprietor2}: <span className="font-mono font-bold" dir="ltr">{phone2}</span>
+          </p>
+        </div>
       </div>
 
       {/* Bill Number & Date Bar */}
@@ -115,7 +125,7 @@ export const UrduReceipt = ({
       </div>
 
       {/* Software credit */}
-      <div className="border-t border-b border-dashed border-black py-1.5 text-center font-sans text-[10px] text-slate-800">
+      <div className="border-t border-b border-dashed border-black py-1.5 text-center font-sans text-[10px] font-semibold text-slate-800 tracking-wide">
         {softwareCredit}
       </div>
     </div>

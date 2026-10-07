@@ -24,15 +24,15 @@ export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
           <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100">
             <NavLink to="/products" className="flex items-center gap-3 overflow-hidden cursor-pointer group">
               <div className="h-10 w-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-lg shrink-0 shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
-                S
+                F
               </div>
               {!isCollapsed && (
                 <div className="min-w-0">
                   <h1 className="text-sm font-extrabold text-slate-900 tracking-tight truncate group-hover:text-indigo-600 transition-colors">
-                    SUPER STORE
+                    FUSION KIRYANA
                   </h1>
-                  <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wider block">
-                    POS System
+                  <span className="text-[10px] font-bold text-indigo-600 font-urdu block truncate">
+                    فیوژن کریانہ ہول سیل سنٹر
                   </span>
                 </div>
               )}
