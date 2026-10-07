@@ -13,10 +13,11 @@ import { OrderDetailModal } from '../features/sales/components/OrderDetailModal'
 import { useStore } from '../hooks/useStore';
 import { calculateStockStatus } from '../utils/posCalculations';
 import { Icon } from '../components/ui/Icon';
+import { matchesProduct } from '../utils/searchMatcher';
 
 export const ProductsPage = () => {
   const navigate = useNavigate();
-  const { products, orders, isLoading, saveProduct, deleteProduct } = useStore();
+  const { products, orders, isLoading, saveProduct, deleteProduct, resetProducts } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
@@ -35,11 +36,7 @@ export const ProductsPage = () => {
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
-        const matchesSearch =
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (p.barcode && p.barcode.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (p.nameUrdu && p.nameUrdu.includes(searchQuery));
+        const matchesSearch = !searchQuery.trim() || matchesProduct(p, searchQuery);
         const matchesCategory =
           selectedCategory === 'All Categories' || p.category === selectedCategory;
         const status = calculateStockStatus(p.stock, p.threshold);
@@ -150,14 +147,26 @@ export const ProductsPage = () => {
       {/* Products Content: Table or Grid */}
       {filteredProducts.length === 0 ? (
         <EmptyState
-          icon="search"
-          title="کوئی پروڈکٹ نہیں ملا"
-          description="فلٹر تبدیل کریں یا اوپر سے نیا پروڈکٹ رجسٹر کریں۔"
-          actionLabel="فلٹر ری سیٹ کریں"
+          icon={products.length === 0 ? 'barcode' : 'search'}
+          title={products.length === 0 ? 'اسٹور میں کوئی پروڈکٹ موجود نہیں ہے' : 'کوئی پروڈکٹ نہیں ملا'}
+          description={
+            products.length === 0
+              ? 'آپ ایک کلک میں فیوژن کریانہ کے ڈیفالٹ پروڈکٹس لوڈ کر سکتے ہیں یا نیا پروڈکٹ شامل کر سکتے ہیں۔'
+              : 'فلٹر تبدیل کریں یا اوپر سے نیا پروڈکٹ رجسٹر کریں۔'
+          }
+          actionLabel={
+            products.length === 0
+              ? 'کریانہ پروڈکٹس لوڈ کریں (Load Default Products)'
+              : 'فلٹر ری سیٹ کریں'
+          }
           onAction={() => {
-            setSearchQuery('');
-            setSelectedCategory('All Categories');
-            setStockFilter('all');
+            if (products.length === 0 && resetProducts) {
+              resetProducts();
+            } else {
+              setSearchQuery('');
+              setSelectedCategory('All Categories');
+              setStockFilter('all');
+            }
           }}
         />
       ) : viewMode === 'table' ? (
