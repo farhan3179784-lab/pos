@@ -14,6 +14,7 @@ export const ProductTable = ({
   onAddToCart,
   onEdit,
   onDelete,
+  onViewSales,
 }) => {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
@@ -129,6 +130,16 @@ export const ProductTable = ({
                         >
                           <Icon name="plus" size={14} />
                           <span>{isOutOfStock ? 'ختم ہے' : 'بل میں ڈالیں'}</span>
+                        </button>
+                      )}
+                      {onViewSales && (
+                        <button
+                          type="button"
+                          onClick={() => onViewSales(product)}
+                          className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors cursor-pointer"
+                          title="اس پروڈکٹ کی فروخت کی ہسٹری دیکھیں"
+                        >
+                          <Icon name="history" size={18} />
                         </button>
                       )}
                       <button

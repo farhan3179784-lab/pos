@@ -8,13 +8,15 @@ import { ProductCard } from '../features/products/components/ProductCard';
 import { ProductTable } from '../features/products/components/ProductTable';
 import { ProductFilters } from '../features/products/components/ProductFilters';
 import { ProductFormModal } from '../features/products/components/ProductFormModal';
+import { ProductSalesModal } from '../features/sales/components/ProductSalesModal';
+import { OrderDetailModal } from '../features/sales/components/OrderDetailModal';
 import { useStore } from '../hooks/useStore';
 import { calculateStockStatus } from '../utils/posCalculations';
 import { Icon } from '../components/ui/Icon';
 
 export const ProductsPage = () => {
   const navigate = useNavigate();
-  const { products, isLoading, saveProduct, deleteProduct } = useStore();
+  const { products, orders, isLoading, saveProduct, deleteProduct } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
@@ -25,6 +27,8 @@ export const ProductsPage = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletingProduct, setDeletingProduct] = useState(null);
+  const [salesProduct, setSalesProduct] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   // Filter and sort products
@@ -93,7 +97,7 @@ export const ProductsPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
           <Button
             variant="secondary"
             size="md"
@@ -101,7 +105,17 @@ export const ProductsPage = () => {
             onClick={() => navigate('/billing')}
             className="text-xs sm:text-sm font-extrabold"
           >
-            بل کاؤنٹر (Go to Billing)
+            بل کاؤنٹر (POS Billing)
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="md"
+            icon="history"
+            onClick={() => navigate('/sales')}
+            className="text-xs sm:text-sm font-extrabold"
+          >
+            سیلز ہسٹری (Sales)
           </Button>
 
           <Button
@@ -114,7 +128,7 @@ export const ProductsPage = () => {
             }}
             className="text-xs sm:text-sm font-extrabold"
           >
-            نیا پروڈکٹ شامل کریں (+ Add Product)
+            نیا پروڈکٹ (+ Add)
           </Button>
         </div>
       </div>
@@ -159,6 +173,7 @@ export const ProductsPage = () => {
             setIsFormModalOpen(true);
           }}
           onDelete={(prod) => setDeletingProduct(prod)}
+          onViewSales={(prod) => setSalesProduct(prod)}
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -212,6 +227,27 @@ export const ProductsPage = () => {
         title="پروڈکٹ حذف کریں؟"
         description={`کیا آپ واقعی "${deletingProduct?.name}" (${deletingProduct?.sku}) کو سسٹم سے ہٹانا چاہتے ہیں؟`}
         confirmText="ہاں، ڈیلیٹ کریں"
+      />
+
+      {/* Product Sales History Modal */}
+      <ProductSalesModal
+        isOpen={Boolean(salesProduct)}
+        onClose={() => setSalesProduct(null)}
+        product={salesProduct}
+        orders={orders}
+        onSelectOrder={(order) => {
+          setSelectedOrder(order);
+        }}
+      />
+
+      {/* Order Detail Modal */}
+      <OrderDetailModal
+        isOpen={Boolean(selectedOrder)}
+        onClose={() => setSelectedOrder(null)}
+        order={selectedOrder}
+        onPrint={() => {
+          window.print();
+        }}
       />
     </div>
   );

@@ -360,11 +360,20 @@ export const BillingPage = () => {
             </span>
             <button
               type="button"
-              onClick={() => navigate('/products')}
+              onClick={() => navigate('/sales')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
+              title="پچھلے تمام بل اور فروخت کی تفصیلات دیکھیں"
+            >
+              <Icon name="history" size={16} />
+              <span>سیلز ہسٹری</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/products')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               <span>پروڈکٹس مینیجر</span>
-              <span className="text-indigo-400">→</span>
+              <span className="text-slate-400">→</span>
             </button>
           </div>
         </div>

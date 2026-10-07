@@ -45,12 +45,12 @@ export const AdminLayout = () => {
             </div>
           </div>
 
-          {/* Center: The Two Big Main Navigation Tabs */}
-          <nav className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+          {/* Center: Main Navigation Tabs */}
+          <nav className="flex items-center gap-1.5 sm:gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
             <NavLink
               to="/billing"
               className={({ isActive }) =>
-                `flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-sm font-extrabold transition-all ${
+                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
                   isActive || location.pathname === '/'
                     ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -62,9 +62,23 @@ export const AdminLayout = () => {
             </NavLink>
 
             <NavLink
+              to="/sales"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                }`
+              }
+            >
+              <Icon name="history" size={18} />
+              <span>سیلز ہسٹری (Sales History)</span>
+            </NavLink>
+
+            <NavLink
               to="/products"
               className={({ isActive }) =>
-                `flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-sm font-extrabold transition-all ${
+                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
                   isActive
                     ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
