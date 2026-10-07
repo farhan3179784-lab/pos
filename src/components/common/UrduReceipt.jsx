@@ -16,8 +16,37 @@ export const UrduReceipt = ({
   if (!order) return null;
 
   const netTotal = Math.round(Number(order.pricing?.grandTotal || order.pricing?.total || 0));
-  const received = Math.round(Number(order.payment?.tendered || netTotal));
+  const received = Math.round(Number(order.payment?.tendered ?? netTotal));
   const change = Math.max(0, received - netTotal);
+
+  // Khata & Baqaya calculations
+  const remainingDue = Math.max(
+    0,
+    Math.round(
+      Number(
+        order.payment?.remaining !== undefined
+          ? order.payment.remaining
+          : netTotal > received
+          ? netTotal - received
+          : 0
+      )
+    )
+  );
+
+  const prevBalance = Math.round(
+    Number(order.payment?.prevBalance ?? order.customer?.prevBalance ?? 0)
+  );
+
+  const totalKhataBalance = Math.round(
+    Number(
+      order.payment?.totalBalanceAfter !== undefined
+        ? order.payment.totalBalanceAfter
+        : prevBalance + remainingDue
+    )
+  );
+
+  const customerName = order.customer?.name || 'کاؤنٹر گاہک (نقد)';
+  const customerPhone = order.customer?.phone || '';
 
   return (
     <div
@@ -54,6 +83,19 @@ export const UrduReceipt = ({
         <span>
           {formatDate(order.createdAt)} {formatTime(order.createdAt)}
         </span>
+      </div>
+
+      {/* Customer Info Bar */}
+      <div className="flex justify-between items-center text-[12px] font-bold font-urdu py-1.5 border-b border-black bg-slate-50/50 px-0.5">
+        <div className="truncate max-w-[210px] text-right">
+          <span className="text-slate-600 font-medium">گاہک: </span>
+          <span className="font-extrabold text-[13px] text-black">{customerName}</span>
+        </div>
+        {customerPhone && (
+          <span className="font-mono text-[11px] font-semibold" dir="ltr">
+            {customerPhone}
+          </span>
+        )}
       </div>
 
       {/* Items Table */}
@@ -102,25 +144,59 @@ export const UrduReceipt = ({
       </table>
 
       {/* Net Total & Received Summary */}
-      <div className="mt-3 pt-1 border-t-2 border-b-2 border-black space-y-1.5 pb-2">
+      <div className="mt-2.5 pt-1 border-t-2 border-b-2 border-black space-y-1 pb-2">
         <div className="flex justify-between items-baseline">
-          <span className="text-sm font-sans font-bold">Net Total</span>
+          <span className="text-sm font-sans font-bold">Net Total (کل بل)</span>
           <span className="text-xl font-sans font-extrabold">{netTotal}</span>
         </div>
         <div className="flex justify-between items-baseline text-xs font-sans font-bold">
-          <span>Received</span>
+          <span>Received (وصول رقم)</span>
           <span>{received}</span>
         </div>
+
         {change > 0 && (
           <div className="flex justify-between items-baseline text-xs font-sans font-bold text-slate-800">
-            <span>Change</span>
+            <span>Change (واپسی رقم)</span>
             <span>{change}</span>
+          </div>
+        )}
+
+        {/* Khata / Baqaya Section */}
+        {(remainingDue > 0 || prevBalance > 0) && (
+          <div className="mt-2 pt-1.5 border-t border-dashed border-black font-urdu text-[12px] space-y-1 bg-slate-50 p-1.5 rounded-sm">
+            {remainingDue > 0 && (
+              <div className="flex justify-between items-center font-bold">
+                <span className="text-black">اس بل کا بقایا:</span>
+                <span className="font-sans font-extrabold text-sm text-black">
+                  Rs. {remainingDue}
+                </span>
+              </div>
+            )}
+
+            {prevBalance > 0 && (
+              <div className="flex justify-between items-center text-slate-800 font-semibold">
+                <span>سابقہ کھاتہ بقایا:</span>
+                <span className="font-sans font-bold text-xs">
+                  Rs. {prevBalance}
+                </span>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center font-extrabold text-[13px] border-t border-black pt-1 mt-1">
+              <span>کل واجب الادا کھاتہ:</span>
+              <span className="font-sans font-black text-sm border-b-2 border-black">
+                Rs. {totalKhataBalance}
+              </span>
+            </div>
+            <div className="text-[10px] text-center font-medium text-slate-700 pt-0.5">
+              (یہ بقایا رقم کسٹمر کے کھاتے میں درج کر دی گئی ہے)
+            </div>
           </div>
         )}
       </div>
 
       {/* Thank you note */}
-      <div className="text-center py-2.5 font-sans text-xs font-semibold">
+      <div className="text-center py-2 font-sans text-xs font-semibold">
         {footerNote}
       </div>
 

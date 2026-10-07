@@ -78,6 +78,20 @@ export const AdminLayout = () => {
             </NavLink>
 
             <NavLink
+              to="/khata"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                }`
+              }
+            >
+              <Icon name="khata" size={18} />
+              <span>گاہک کھاتہ (Khata Ledger)</span>
+            </NavLink>
+
+            <NavLink
               to="/products"
               className={({ isActive }) =>
                 `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${

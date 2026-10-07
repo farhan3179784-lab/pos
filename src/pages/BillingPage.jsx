@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { Icon } from '../components/ui/Icon';
 import { Modal } from '../components/ui/Modal';
+import { Badge } from '../components/ui/Badge';
 import { formatCurrency } from '../utils/currency';
 import { isWeightBasedUnit } from '../constants/units';
 import { UrduReceipt } from '../components/common/UrduReceipt';
@@ -15,7 +16,15 @@ import { matchesProduct } from '../utils/searchMatcher';
 
 export const BillingPage = () => {
   const navigate = useNavigate();
-  const { products, isLoading, createOrder, saveProduct, resetProducts } = useStore();
+  const {
+    products,
+    isLoading,
+    createOrder,
+    saveProduct,
+    resetProducts,
+    customers = [],
+    saveCustomer,
+  } = useStore();
 
   // State for current bill
   const [billItems, setBillItems] = useState([]);
@@ -25,6 +34,16 @@ export const BillingPage = () => {
   const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false);
   const [printedOrder, setPrintedOrder] = useState(null);
   const [billNotice, setBillNotice] = useState(null);
+
+  // Customer & Khata state
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [customCustomerName, setCustomCustomerName] = useState('');
+  const [customCustomerPhone, setCustomCustomerPhone] = useState('');
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [newCustName, setNewCustName] = useState('');
+  const [newCustPhone, setNewCustPhone] = useState('');
+  const [newCustAddress, setNewCustAddress] = useState('');
+  const [newCustInitialBalance, setNewCustInitialBalance] = useState('');
 
   // Quick register modal for newly scanned physical barcodes
   const [unregisteredBarcode, setUnregisteredBarcode] = useState(null);
@@ -233,6 +252,9 @@ export const BillingPage = () => {
     setSearchQuery('');
     setCashTendered('');
     setOverallDiscount('');
+    setSelectedCustomerId('');
+    setCustomCustomerName('');
+    setCustomCustomerPhone('');
     setBillNotice(null);
     searchInputRef.current?.focus();
   };
@@ -250,8 +272,60 @@ export const BillingPage = () => {
   const totalDiscount = itemsTotalDiscount + billExtraDiscount;
   const netPayable = Math.max(0, subtotal - totalDiscount);
 
-  const tenderedAmount = Number(cashTendered) || 0;
-  const changeDue = tenderedAmount >= netPayable ? tenderedAmount - netPayable : 0;
+  // Selected customer object and balance
+  const selectedCustomer = useMemo(() => {
+    if (!selectedCustomerId) return null;
+    return customers.find((c) => c.id === selectedCustomerId) || null;
+  }, [customers, selectedCustomerId]);
+
+  const customerPrevBalance = Math.round(Number(selectedCustomer?.currentBalance) || 0);
+
+  // Cash tendered & Remaining calculation
+  // If cashTendered is empty string, default to netPayable (paid in full).
+  // If user explicitly types a number (e.g. '0' or less than netPayable), calculate remaining due.
+  const isTenderedExplicit = cashTendered !== '';
+  const tenderedAmount = isTenderedExplicit ? Math.max(0, Number(cashTendered) || 0) : netPayable;
+  const billRemaining = tenderedAmount < netPayable ? netPayable - tenderedAmount : 0;
+  const changeDue = tenderedAmount > netPayable ? tenderedAmount - netPayable : 0;
+  const totalKhataBalanceAfter = customerPrevBalance + billRemaining;
+
+  // Quick save new customer from modal
+  const handleQuickSaveNewCustomer = async (e) => {
+    e.preventDefault();
+    if (!newCustName.trim()) {
+      alert('گاہک کا نام درج کرنا لازمی ہے۔');
+      return;
+    }
+    const initialBal = Number(newCustInitialBalance) || 0;
+    const newCust = await saveCustomer({
+      name: newCustName.trim(),
+      phone: newCustPhone.trim(),
+      address: newCustAddress.trim(),
+      currentBalance: initialBal,
+      transactions: initialBal > 0
+        ? [
+            {
+              id: `tx_init_${Date.now()}`,
+              date: new Date().toISOString(),
+              type: 'BILL_CREDIT',
+              description: 'سابقہ پرانا کھاتہ ادھار (Initial Balance)',
+              debit: initialBal,
+              credit: 0,
+              balanceAfter: initialBal,
+            },
+          ]
+        : [],
+    });
+
+    setSelectedCustomerId(newCust.id);
+    setIsNewCustomerModalOpen(false);
+    setNewCustName('');
+    setNewCustPhone('');
+    setNewCustAddress('');
+    setNewCustInitialBalance('');
+    setBillNotice(`نیا کھاتہ دار "${newCust.name}" بل کے لیے منتخب ہو گیا!`);
+    setTimeout(() => setBillNotice(null), 3500);
+  };
 
   // Print Slip
   const handlePrintSlip = async () => {
@@ -260,11 +334,38 @@ export const BillingPage = () => {
       return;
     }
 
+    let finalCustomerName = (selectedCustomer?.name || customCustomerName || '').trim();
+    let finalCustomerPhone = (selectedCustomer?.phone || customCustomerPhone || '').trim();
+
+    // If there is an unpaid balance (baqaya / udhaar) on this bill, require a customer name so Khata can be maintained!
+    if (billRemaining > 0 && !finalCustomerName) {
+      const entered = window.prompt(
+        `اس بل کا بقایا رقم Rs. ${billRemaining} ہے۔\nبراہ کرم گاہک کا نام درج کریں تاکہ یہ بقایا کھاتے میں محفوظ ہو سکے:`,
+        ''
+      );
+      if (!entered || !entered.trim()) {
+        alert('بقایا بل کے لیے گاہک کا نام ضروری ہے تاکہ کسٹمر کے کھاتے میں ریکارڈ رکھا جا سکے۔');
+        return;
+      }
+      finalCustomerName = entered.trim();
+      setCustomCustomerName(finalCustomerName);
+    }
+
+    if (!finalCustomerName) {
+      finalCustomerName = 'Walk-in Customer (کاؤنٹر گاہک)';
+    }
+
     try {
       const orderData = {
         id: generateOrderId(),
         createdAt: new Date().toISOString(),
-        customer: { name: 'Walk-in Customer (کاؤنٹر گاہک)', type: 'Walk-in' },
+        customer: {
+          id: selectedCustomer?.id || null,
+          name: finalCustomerName,
+          phone: finalCustomerPhone,
+          type: selectedCustomer ? 'Khata' : (finalCustomerName.startsWith('Walk-in') ? 'Walk-in' : 'Customer'),
+          prevBalance: customerPrevBalance,
+        },
         items: billItems.map((item) => ({
           productId: item.id,
           id: item.id,
@@ -286,18 +387,29 @@ export const BillingPage = () => {
         },
         payment: {
           method: 'Cash',
-          status: 'Paid',
-          tendered: tenderedAmount > 0 ? tenderedAmount : netPayable,
+          status: billRemaining > 0 ? (tenderedAmount > 0 ? 'Partial' : 'Credit') : 'Paid',
+          tendered: tenderedAmount,
           change: changeDue,
+          remaining: billRemaining,
+          prevBalance: customerPrevBalance,
+          totalBalanceAfter: totalKhataBalanceAfter,
         },
       };
 
-      // Save order to store
+      // Save order to store (StoreContext will auto-record bill credit in Customer Khata if remaining > 0)
       await createOrder(orderData);
 
-      // Set print state and invoke window.print
+      // Set print state
       setPrintedOrder(orderData);
-      setBillNotice(`بل نمبر ${orderData.id} محفوظ اور پرنٹ ہو گیا۔`);
+      setBillNotice(`بل نمبر ${orderData.id} (${finalCustomerName}) محفوظ اور پرنٹ ہو گیا۔`);
+
+      // Reset bill inputs for next customer
+      setBillItems([]);
+      setCashTendered('');
+      setOverallDiscount('');
+      setSelectedCustomerId('');
+      setCustomCustomerName('');
+      setCustomCustomerPhone('');
 
       // Trigger browser print
       setTimeout(() => {
@@ -650,78 +762,242 @@ export const BillingPage = () => {
 
           {/* TOTALS & ACTIONS ROW */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
-            {/* Left: Extra Bill Discount & Cash Tendered */}
+            {/* Left: Customer Selection, Extra Discount & Cash Tendered */}
             <div className="lg:col-span-6 bg-slate-50 p-5 rounded-2xl border border-slate-200/90 space-y-4">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">
-                ادائیگی کی تفصیلات (Cash & Payment)
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {/* Overall Discount */}
-                <div>
-                  <label className="text-xs font-extrabold text-slate-700 block mb-1">
-                    اضافی بل رعایت (Extra Bill Discount Rs.)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm">
-                      Rs.
+              
+              {/* CUSTOMER & KHATA SECTION */}
+              <div className="p-4 bg-white rounded-xl border border-slate-200/90 shadow-2xs space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700">
+                      <Icon name="khata" size={18} />
                     </span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={overallDiscount}
-                      onChange={(e) => setOverallDiscount(e.target.value)}
-                      placeholder="0"
-                      className="w-full pl-10 pr-3 py-2.5 bg-white rounded-xl border-2 border-slate-300 text-sm font-black text-slate-900 outline-none focus:border-indigo-600"
-                    />
+                    <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">
+                      گاہک اور کھاتہ (Customer & Khata)
+                    </h3>
                   </div>
-                </div>
-
-                {/* Cash Tendered */}
-                <div>
-                  <label className="text-xs font-extrabold text-slate-700 block mb-1">
-                    وصول شدہ کیش (Cash Received)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm">
-                      Rs.
-                    </span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={cashTendered}
-                      onChange={(e) => setCashTendered(e.target.value)}
-                      placeholder={netPayable.toString()}
-                      className="w-full pl-10 pr-3 py-2.5 bg-white rounded-xl border-2 border-slate-300 text-sm font-black text-slate-900 outline-none focus:border-indigo-600"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Cash Buttons */}
-              <div>
-                <span className="text-xs text-slate-500 font-bold block mb-1.5">
-                  فوری رقم بٹن (Quick Cash):
-                </span>
-                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => setCashTendered(netPayable.toString())}
-                    className="px-3 py-1.5 text-xs font-black bg-white hover:bg-slate-200 border-2 border-slate-300 rounded-xl text-slate-800 cursor-pointer"
+                    onClick={() => setIsNewCustomerModalOpen(true)}
+                    className="flex items-center gap-1 text-[11px] font-black text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                   >
-                    برابر (Exact: Rs. {netPayable})
+                    <Icon name="plus" size={13} />
+                    <span>+ نیا کھاتہ دار</span>
                   </button>
-                  {[500, 1000, 2000, 5000].map((amt) => (
+                </div>
+
+                {/* Customer Dropdown Selector */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-500 block mb-1">
+                    کھاتہ دار منتخب کریں (Select Existing Khata Customer):
+                  </label>
+                  <select
+                    value={selectedCustomerId}
+                    onChange={(e) => {
+                      setSelectedCustomerId(e.target.value);
+                      if (e.target.value) {
+                        const cust = customers.find((c) => c.id === e.target.value);
+                        if (cust) {
+                          setCustomCustomerName(cust.name);
+                          setCustomCustomerPhone(cust.phone || '');
+                        }
+                      } else {
+                        setCustomCustomerName('');
+                        setCustomCustomerPhone('');
+                      }
+                    }}
+                    className="w-full text-xs sm:text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:border-indigo-600 text-slate-900 cursor-pointer"
+                  >
+                    <option value="">کاؤنٹر گاہک (نقد / Walk-in Customer)</option>
+                    {customers.map((c) => {
+                      const bal = Number(c.currentBalance) || 0;
+                      return (
+                        <option key={c.id} value={c.id}>
+                          {c.name} {c.phone ? `(${c.phone})` : ''} — {bal > 0 ? `سابقہ ادھار: Rs. ${bal}` : 'صاف کھاتہ ✓'}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* If Khata Customer Selected: Show Profile Card */}
+                {selectedCustomer ? (
+                  <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl flex items-center justify-between animate-fadeIn">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-sm text-indigo-950">
+                          {selectedCustomer.name}
+                        </span>
+                        {selectedCustomer.phone && (
+                          <span className="text-[11px] font-mono text-indigo-700 font-bold" dir="ltr">
+                            {selectedCustomer.phone}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-600 font-medium mt-0.5">
+                        سابقہ کھاتہ بیلنس:
+                        <strong className={`font-mono text-xs ml-1 ${customerPrevBalance > 0 ? 'text-rose-700' : 'text-emerald-700'}`}>
+                          {formatCurrency(customerPrevBalance)}
+                        </strong>
+                        {customerPrevBalance > 0 ? ' (واجب الادا ادھار)' : ' (کلیئر)'}
+                      </div>
+                    </div>
+
                     <button
-                      key={amt}
                       type="button"
-                      onClick={() => setCashTendered(amt.toString())}
+                      onClick={() => {
+                        setSelectedCustomerId('');
+                        setCustomCustomerName('');
+                        setCustomCustomerPhone('');
+                      }}
+                      className="text-xs font-bold text-rose-600 hover:text-rose-800 p-1 rounded-lg hover:bg-rose-50 cursor-pointer"
+                      title="گاہک کا انتخاب ختم کریں"
+                    >
+                      ✕ ہٹائیں
+                    </button>
+                  </div>
+                ) : (
+                  /* Custom Name & Phone input for Walk-in or one-off customers */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="گاہک کا نام (اختیاری)"
+                        value={customCustomerName}
+                        onChange={(e) => setCustomCustomerName(e.target.value)}
+                        className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:border-indigo-600"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="موبائل نمبر (اختیاری)"
+                        value={customCustomerPhone}
+                        onChange={(e) => setCustomCustomerPhone(e.target.value)}
+                        className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:border-indigo-600 font-mono"
+                        dir="ltr"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* PAYMENT INPUTS */}
+              <div className="space-y-3">
+                <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">
+                  ادائیگی کی تفصیلات (Cash & Payment)
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Overall Discount */}
+                  <div>
+                    <label className="text-xs font-extrabold text-slate-700 block mb-1">
+                      اضافی بل رعایت (Discount Rs.)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm">
+                        Rs.
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={overallDiscount}
+                        onChange={(e) => setOverallDiscount(e.target.value)}
+                        placeholder="0"
+                        className="w-full pl-10 pr-3 py-2.5 bg-white rounded-xl border-2 border-slate-300 text-sm font-black text-slate-900 outline-none focus:border-indigo-600"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Cash Tendered */}
+                  <div>
+                    <label className="text-xs font-extrabold text-slate-700 block mb-1">
+                      وصول شدہ کیش (Cash Received)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm">
+                        Rs.
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={cashTendered}
+                        onChange={(e) => setCashTendered(e.target.value)}
+                        placeholder={netPayable.toString()}
+                        className="w-full pl-10 pr-3 py-2.5 bg-white rounded-xl border-2 border-slate-300 text-sm font-black text-slate-900 outline-none focus:border-indigo-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Cash Buttons */}
+                <div>
+                  <span className="text-xs text-slate-500 font-bold block mb-1.5">
+                    فوری رقم بٹن (Quick Cash):
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCashTendered(netPayable.toString())}
                       className="px-3 py-1.5 text-xs font-black bg-white hover:bg-slate-200 border-2 border-slate-300 rounded-xl text-slate-800 cursor-pointer"
                     >
-                      Rs. {amt}
+                      برابر (Exact: Rs. {netPayable})
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => setCashTendered('0')}
+                      className="px-3 py-1.5 text-xs font-black bg-rose-50 hover:bg-rose-100 border-2 border-rose-300 rounded-xl text-rose-800 cursor-pointer"
+                      title="تمام بل ادھار پر رکھیں"
+                    >
+                      ادھار (Rs. 0 نقد)
+                    </button>
+                    {[500, 1000, 2000, 5000].map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setCashTendered(amt.toString())}
+                        className="px-3 py-1.5 text-xs font-black bg-white hover:bg-slate-200 border-2 border-slate-300 rounded-xl text-slate-800 cursor-pointer"
+                      >
+                        Rs. {amt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* KHATA DUE / BAQAYA ALERT BOX */}
+                {billRemaining > 0 && (
+                  <div className="p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl space-y-2 animate-fadeIn">
+                    <div className="flex items-center justify-between text-amber-950 font-bold text-xs sm:text-sm">
+                      <span className="flex items-center gap-1.5">
+                        <Icon name="warning" size={16} className="text-amber-700" />
+                        <span>اس بل کا بقایا (Unpaid Udhaar):</span>
+                      </span>
+                      <span className="font-mono font-black text-rose-700 text-base">
+                        {formatCurrency(billRemaining)}
+                      </span>
+                    </div>
+
+                    {customerPrevBalance > 0 && (
+                      <div className="flex justify-between items-center text-slate-700 text-xs font-medium border-t border-amber-200 pt-1.5">
+                        <span>سابقہ کھاتہ بقایا (Previous Khata):</span>
+                        <span className="font-mono font-bold text-slate-900">
+                          {formatCurrency(customerPrevBalance)}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center text-slate-900 font-black text-xs sm:text-sm pt-1 border-t border-amber-300">
+                      <span>کل نیا واجب الادا کھاتہ (Total Khata Balance):</span>
+                      <span className="font-mono text-base sm:text-lg text-rose-800">
+                        {formatCurrency(totalKhataBalanceAfter)}
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-amber-900 font-bold bg-amber-100/70 p-2 rounded-lg text-center">
+                      ✓ یہ بقایا رقم گاہک کے کھاتے میں خود بخود درج ہو جائے گی اور سلپ پر بھی پرنٹ ہوگی۔
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -743,13 +1019,28 @@ export const BillingPage = () => {
                 <div className="flex justify-between text-slate-400">
                   <span>وصول شدہ رقم (Received):</span>
                   <span className="font-mono text-white text-base">
-                    {tenderedAmount > 0 ? formatCurrency(tenderedAmount) : '—'}
+                    {isTenderedExplicit ? formatCurrency(tenderedAmount) : `${formatCurrency(netPayable)} (پورا کیش)`}
                   </span>
                 </div>
-                {tenderedAmount > 0 && (
+                {changeDue > 0 && (
                   <div className="flex justify-between text-emerald-400 font-black">
-                    <span>بقایا رقم (Change Due):</span>
+                    <span>بقایا واپسی رقم (Change Due):</span>
                     <span className="font-mono text-lg">{formatCurrency(changeDue)}</span>
+                  </div>
+                )}
+
+                {/* If Udhaar / Khata remaining on this bill */}
+                {billRemaining > 0 && (
+                  <div className="flex justify-between text-rose-400 font-black border-t border-slate-800 pt-2">
+                    <span>اس بل کا بقایا (Credit Due):</span>
+                    <span className="font-mono text-lg text-rose-400">{formatCurrency(billRemaining)}</span>
+                  </div>
+                )}
+
+                {totalKhataBalanceAfter > 0 && billRemaining > 0 && (
+                  <div className="flex justify-between text-amber-300 font-bold text-xs">
+                    <span>کل کھاتہ واجب الادا (Net Khata Balance):</span>
+                    <span className="font-mono text-sm text-amber-300">{formatCurrency(totalKhataBalanceAfter)}</span>
                   </div>
                 )}
               </div>
@@ -875,6 +1166,91 @@ export const BillingPage = () => {
                 className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm transition-colors shadow-md cursor-pointer"
               >
                 محفوظ اور بل میں شامل کریں ✓
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* QUICK MODAL: Register New Khata Customer from Billing */}
+      {isNewCustomerModalOpen && (
+        <Modal
+          isOpen={isNewCustomerModalOpen}
+          onClose={() => setIsNewCustomerModalOpen(false)}
+          title="نیا کھاتہ دار شامل کریں (New Khata Customer)"
+          subtitle="گاہک کا نام و معلومات درج کریں تاکہ بقایا کھاتے میں شامل ہو سکے"
+          maxWidth="max-w-md"
+        >
+          <form onSubmit={handleQuickSaveNewCustomer} className="space-y-4">
+            <div>
+              <label className="text-xs font-black text-slate-800 block mb-1">
+                گاہک کا نام (Customer Name) <span className="text-rose-500">*</span>:
+              </label>
+              <input
+                type="text"
+                placeholder="مثلاً: حاجی محمد اکرم یا چوہدری طارق"
+                value={newCustName}
+                onChange={(e) => setNewCustName(e.target.value)}
+                className="w-full text-sm font-bold bg-white border-2 border-slate-300 rounded-xl p-3 outline-none focus:border-indigo-600 text-slate-900"
+                required
+                autoFocus
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black text-slate-800 block mb-1">
+                موبائل / فون نمبر (Phone):
+              </label>
+              <input
+                type="text"
+                placeholder="مثلاً: 0300-1234567"
+                value={newCustPhone}
+                onChange={(e) => setNewCustPhone(e.target.value)}
+                className="w-full text-sm font-bold bg-white border-2 border-slate-300 rounded-xl p-3 outline-none focus:border-indigo-600 text-slate-900 font-mono"
+                dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black text-slate-800 block mb-1">
+                پتہ / دکان کا پتہ (Address):
+              </label>
+              <input
+                type="text"
+                placeholder="مثلاً: گلی نمبر 4 رجانہ روڈ"
+                value={newCustAddress}
+                onChange={(e) => setNewCustAddress(e.target.value)}
+                className="w-full text-sm font-bold bg-white border-2 border-slate-300 rounded-xl p-3 outline-none focus:border-indigo-600 text-slate-900"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black text-slate-800 block mb-1">
+                پرانا سابقہ ادھار رقم (Previous Due Balance Rs.):
+              </label>
+              <input
+                type="number"
+                min="0"
+                placeholder="0 (اگر پہلے سے کوئی ادھار ہے)"
+                value={newCustInitialBalance}
+                onChange={(e) => setNewCustInitialBalance(e.target.value)}
+                className="w-full text-sm font-bold bg-white border-2 border-slate-300 rounded-xl p-3 outline-none focus:border-indigo-600 text-slate-900"
+              />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsNewCustomerModalOpen(false)}
+                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-colors cursor-pointer"
+              >
+                منسوخ (Cancel)
+              </button>
+              <button
+                type="submit"
+                className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-sm transition-colors shadow-md cursor-pointer"
+              >
+                کھاتہ دار محفوظ کریں ✓
               </button>
             </div>
           </form>

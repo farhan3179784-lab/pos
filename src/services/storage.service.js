@@ -1,11 +1,13 @@
 import { INITIAL_PRODUCTS } from '../data/mock/mockProducts';
 import { INITIAL_ORDERS } from '../data/mock/mockOrders';
 import { INITIAL_INVENTORY_LOGS } from '../data/mock/mockInventory';
+import { INITIAL_CUSTOMERS } from '../data/mock/mockCustomers';
 
 const STORAGE_KEYS = {
   PRODUCTS: 'fusion_pos_products_v4',
   ORDERS: 'fusion_pos_orders_v4',
   INVENTORY_LOGS: 'fusion_pos_inventory_logs_v4',
+  CUSTOMERS: 'fusion_pos_customers_v4',
   INITIALIZED: 'fusion_pos_initialized_v4',
 };
 
@@ -121,6 +123,42 @@ export const storageService = {
       localStorage.setItem(STORAGE_KEYS.INVENTORY_LOGS, JSON.stringify(logs));
     } catch (e) {
       console.error('Failed to save inventory logs to localStorage', e);
+    }
+  },
+
+  getCustomers() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
+      if (!data) {
+        localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
+        return INITIAL_CUSTOMERS;
+      }
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+      return INITIAL_CUSTOMERS;
+    } catch (e) {
+      console.error('Failed to read customers from storage', e);
+      return INITIAL_CUSTOMERS;
+    }
+  },
+
+  setCustomers(customers) {
+    try {
+      const clean = Array.isArray(customers) ? customers : [];
+      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(clean));
+    } catch (e) {
+      console.error('Failed to save customers to localStorage', e);
+    }
+  },
+
+  resetToDefaultCustomers() {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
+      return INITIAL_CUSTOMERS;
+    } catch {
+      return INITIAL_CUSTOMERS;
     }
   },
 };

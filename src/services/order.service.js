@@ -21,7 +21,7 @@ export const orderService = {
     });
   },
 
-  async createOrder({ items, pricing, payment, customer }) {
+  async createOrder({ id, createdAt, items, pricing, payment, customer }) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const products = storageService.getProducts();
@@ -71,16 +71,20 @@ export const orderService = {
 
         // 3. Create unique order record
         const newOrder = {
-          id: generateOrderId(),
-          createdAt: new Date().toISOString(),
-          customer: customer || { name: 'Walk-in Customer', type: 'Walk-in' },
+          id: id || generateOrderId(),
+          createdAt: createdAt || new Date().toISOString(),
+          customer: customer || { name: 'Walk-in Customer (کاؤنٹر گاہک)', type: 'Walk-in' },
           items,
           pricing,
           payment: {
-            method: payment.method,
-            status: payment.status || 'Paid',
-            tendered: payment.tendered || pricing.grandTotal,
+            method: payment.method || 'Cash',
+            status: payment.status || (payment.remaining > 0 ? 'Partial' : 'Paid'),
+            tendered: payment.tendered !== undefined ? payment.tendered : pricing.grandTotal,
             change: payment.change || 0,
+            remaining: payment.remaining || 0,
+            prevBalance: payment.prevBalance || 0,
+            totalBalanceAfter: payment.totalBalanceAfter || 0,
+            notes: payment.notes || '',
           },
           status: 'Completed',
         };

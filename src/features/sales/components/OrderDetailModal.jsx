@@ -33,12 +33,21 @@ export const OrderDetailModal = ({ isOpen, onClose, order, onPrint }) => {
                 <span className="font-black text-slate-900 text-base">
                   بل نمبر: {order.id}
                 </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-800">
-                  {order.status || 'مکمل (Completed)'}
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold ${
+                  order.payment?.remaining > 0
+                    ? 'bg-rose-100 text-rose-800'
+                    : 'bg-emerald-100 text-emerald-800'
+                }`}>
+                  {order.payment?.remaining > 0 ? 'ادھار بل (Credit)' : 'مکمل ادا شدہ'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                گاہک: <span className="font-bold text-slate-700">{order.customer?.name || 'Walk-in Customer'}</span>
+                گاہک: <span className="font-bold text-slate-800 text-sm">{order.customer?.name || 'Walk-in Customer'}</span>
+                {order.customer?.phone && (
+                  <span className="font-mono text-slate-500 font-bold ml-2" dir="ltr">
+                    ({order.customer.phone})
+                  </span>
+                )}
               </p>
             </div>
           </div>
@@ -132,19 +141,46 @@ export const OrderDetailModal = ({ isOpen, onClose, order, onPrint }) => {
 
           <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
             <span className="text-sm sm:text-base font-black text-slate-900">
-              نیٹ ادا شدہ رقم (Net Paid):
+              کل بل رقم (Grand Total):
             </span>
             <span className="text-lg sm:text-xl font-black text-indigo-700">
               {formatCurrency(netTotal)}
             </span>
           </div>
 
-          <div className="pt-2 border-t border-dashed border-slate-200 flex flex-wrap justify-between items-center text-xs text-slate-500 font-medium">
-            <span>وصول شدہ رقم: <strong className="text-slate-800">{formatCurrency(received)}</strong></span>
+          <div className="pt-2 border-t border-dashed border-slate-200 flex flex-wrap justify-between items-center text-xs text-slate-600 font-medium">
+            <span>وصول شدہ رقم: <strong className="text-slate-900 font-mono text-sm">{formatCurrency(received)}</strong></span>
             {change > 0 && (
-              <span>واپس بقایا رقم: <strong className="text-emerald-700">{formatCurrency(change)}</strong></span>
+              <span>واپس بقایا رقم: <strong className="text-emerald-700 font-mono text-sm">{formatCurrency(change)}</strong></span>
             )}
           </div>
+
+          {order.payment?.remaining > 0 && (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1 text-xs">
+              <div className="flex justify-between items-center font-bold text-rose-800">
+                <span>اس بل کا بقایا (Credit Due):</span>
+                <span className="font-mono text-sm font-black text-rose-700">
+                  {formatCurrency(order.payment.remaining)}
+                </span>
+              </div>
+              {order.payment?.prevBalance > 0 && (
+                <div className="flex justify-between items-center text-slate-600 font-medium">
+                  <span>سابقہ کھاتہ بقایا (Previous Balance):</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    {formatCurrency(order.payment.prevBalance)}
+                  </span>
+                </div>
+              )}
+              {order.payment?.totalBalanceAfter > 0 && (
+                <div className="flex justify-between items-center font-black text-slate-900 pt-1 border-t border-rose-200">
+                  <span>کل نیا کھاتہ واجب الادا (Net Khata Balance):</span>
+                  <span className="font-mono text-sm text-rose-800">
+                    {formatCurrency(order.payment.totalBalanceAfter)}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}

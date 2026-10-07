@@ -64,9 +64,14 @@ export const SalesTable = ({ orders = [], onViewDetail, onPrintSlip }) => {
 
                   {/* Customer */}
                   <td className="py-4 px-4">
-                    <span className="text-sm font-semibold text-slate-800">
+                    <div className="text-sm font-extrabold text-slate-900">
                       {order.customer?.name || 'Walk-in Customer'}
-                    </span>
+                    </div>
+                    {order.customer?.phone && (
+                      <div className="text-[11px] font-mono text-slate-500 font-bold" dir="ltr">
+                        {order.customer.phone}
+                      </div>
+                    )}
                   </td>
 
                   {/* Sold items preview */}
@@ -81,12 +86,19 @@ export const SalesTable = ({ orders = [], onViewDetail, onPrintSlip }) => {
                     </div>
                   </td>
 
-                  {/* Payment */}
+                  {/* Payment & Khata Status */}
                   <td className="py-4 px-4">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                      <Icon name="cash" size={14} className="text-emerald-600" />
-                      <span>{order.payment?.method || 'Cash'}</span>
-                    </span>
+                    {order.payment?.remaining > 0 ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-rose-50 text-rose-800 border border-rose-200">
+                        <Icon name="warning" size={13} className="text-rose-600" />
+                        <span>ادھار: {formatCurrency(order.payment.remaining)}</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <Icon name="check" size={13} className="text-emerald-600" />
+                        <span>مکمل ادا شدہ</span>
+                      </span>
+                    )}
                   </td>
 
                   {/* Total Amount */}
