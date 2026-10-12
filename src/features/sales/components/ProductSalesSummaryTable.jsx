@@ -8,9 +8,9 @@ export const ProductSalesSummaryTable = ({
   onSelectProduct,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden min-w-0 w-full">
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-[720px] sm:min-w-full w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-100/90 text-slate-800 font-black text-xs sm:text-sm border-b border-slate-200 tracking-wider">
               <th className="py-4 px-4">پروڈکٹ کا نام (Product)</th>

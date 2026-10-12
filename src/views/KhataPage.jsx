@@ -225,116 +225,116 @@ export const KhataPage = () => {
       )}
 
       {/* HEADER SECTION */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-indigo-600 text-white flex items-center justify-center font-black shadow-md shadow-amber-200">
-            <Icon name="khata" size={26} />
+      <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-xs p-3.5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-600 to-indigo-600 text-white flex items-center justify-center font-black shadow-md shadow-amber-200 shrink-0">
+            <Icon name="khata" size={22} />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                کسٹمر کھاتہ رجسٹر (Customer Khata Ledger)
+              <h1 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight truncate">
+                کسٹمر کھاتہ رجسٹر (Khata)
               </h1>
               <Badge variant="warning" size="sm">
-                ادھار و ریکوری
+                ادھار
               </Badge>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-              تمام گاہکوں کے بقایا جات، ادھار بل اور نقد وصولیوں کا خودکار کھاتہ
+            <p className="text-[11px] sm:text-sm text-slate-500 font-medium truncate mt-0.5">
+              تمام گاہکوں کے بقایا جات اور نقد وصولیوں کا خودکار کھاتہ
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
+        <div className="flex items-center gap-2 w-full md:w-auto">
           <button
             type="button"
             onClick={resetCustomers}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+            className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs sm:text-sm transition-colors cursor-pointer shrink-0"
             title="نمونہ کھاتہ دار ری سیٹ کریں"
           >
-            ری سیٹ نمونہ ڈیٹا
+            ری سیٹ
           </button>
 
           <button
             type="button"
             onClick={handleOpenAddModal}
-            className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-md active:scale-95 cursor-pointer"
+            className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-md active:scale-95 cursor-pointer truncate"
           >
-            <Icon name="plus" size={18} />
-            <span>+ نیا کھاتہ دار شامل کریں</span>
+            <Icon name="plus" size={16} />
+            <span>+ نیا کھاتہ دار</span>
           </button>
         </div>
       </div>
 
       {/* STATS KPI CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         {/* Total Customers */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-bold mb-2">
-            <span>کل کھاتہ دار (Total Customers)</span>
-            <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
-              <Icon name="user" size={18} />
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500 text-[11px] sm:text-xs font-bold mb-1.5">
+            <span className="truncate">کل کھاتہ دار</span>
+            <span className="p-1 sm:p-2 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl shrink-0">
+              <Icon name="user" size={15} />
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+          <div className="text-xl sm:text-3xl font-black text-slate-900 font-mono">
             {stats.totalCustomers}
           </div>
-          <div className="text-[11px] text-slate-400 font-medium mt-1">
-            سسٹم میں رجسٹرڈ تمام گاہک
+          <div className="text-[10px] sm:text-[11px] text-slate-400 font-medium mt-0.5 truncate">
+            رجسٹرڈ گاہک
           </div>
         </div>
 
         {/* Total Outstanding Khata Balance */}
-        <div className="bg-gradient-to-br from-rose-50 to-white p-5 rounded-2xl border border-rose-200/90 shadow-2xs">
-          <div className="flex items-center justify-between text-rose-700 text-xs font-bold mb-2">
-            <span>کل واجب الادا ادھار (Total Credit Due)</span>
-            <span className="p-2 bg-rose-100 text-rose-700 rounded-xl">
-              <Icon name="warning" size={18} />
+        <div className="bg-gradient-to-br from-rose-50 to-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-rose-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-rose-700 text-[11px] sm:text-xs font-bold mb-1.5">
+            <span className="truncate">کل ادھار بقایا</span>
+            <span className="p-1 sm:p-2 bg-rose-100 text-rose-700 rounded-lg sm:rounded-xl shrink-0">
+              <Icon name="warning" size={15} />
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-rose-700 font-mono">
+          <div className="text-lg sm:text-3xl font-black text-rose-700 font-mono truncate">
             {formatCurrency(stats.totalBalanceDue)}
           </div>
-          <div className="text-[11px] text-rose-600 font-medium mt-1">
-            مارکیٹ میں گاہکوں کے ذمہ واجب الادا بقایا
+          <div className="text-[10px] sm:text-[11px] text-rose-600 font-medium mt-0.5 truncate">
+            واجب الادا بقایا
           </div>
         </div>
 
         {/* Active Due Customers */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <div className="flex items-center justify-between text-amber-700 text-xs font-bold mb-2">
-            <span>بقایا دار گاہک (Active Debtors)</span>
-            <span className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-              <Icon name="trend-up" size={18} />
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-amber-700 text-[11px] sm:text-xs font-bold mb-1.5">
+            <span className="truncate">بقایا دار گاہک</span>
+            <span className="p-1 sm:p-2 bg-amber-50 text-amber-600 rounded-lg sm:rounded-xl shrink-0">
+              <Icon name="trend-up" size={15} />
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-amber-800 font-mono">
+          <div className="text-xl sm:text-3xl font-black text-amber-800 font-mono">
             {stats.customersWithDue}
           </div>
-          <div className="text-[11px] text-amber-700 font-medium mt-1">
-            جن کے ذمہ ابھی رقم باقی ہے
+          <div className="text-[10px] sm:text-[11px] text-amber-700 font-medium mt-0.5 truncate">
+            ادھار باقی ہے
           </div>
         </div>
 
         {/* Cleared Accounts */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <div className="flex items-center justify-between text-emerald-700 text-xs font-bold mb-2">
-            <span>صاف کھاتے (Cleared Accounts)</span>
-            <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-              <Icon name="check" size={18} />
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-emerald-700 text-[11px] sm:text-xs font-bold mb-1.5">
+            <span className="truncate">صاف کھاتے</span>
+            <span className="p-1 sm:p-2 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl shrink-0">
+              <Icon name="check" size={15} />
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">
+          <div className="text-xl sm:text-3xl font-black text-emerald-700 font-mono">
             {stats.clearedCustomers}
           </div>
-          <div className="text-[11px] text-emerald-600 font-medium mt-1">
-            جن کا تمام ادھار بے باک ہو چکا ہے
+          <div className="text-[10px] sm:text-[11px] text-emerald-600 font-medium mt-0.5 truncate">
+            بے باک کھاتے
           </div>
         </div>
       </div>
 
       {/* SEARCH & FILTERS BAR */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
         <div className="relative w-full sm:max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <Icon name="search" size={18} />
@@ -343,63 +343,63 @@ export const KhataPage = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="گاہک کا نام، فون نمبر یا پتہ تلاش کریں..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-600 text-xs sm:text-sm font-bold outline-none transition-colors"
+            placeholder="گاہک نام، فون یا پتہ..."
+            className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl border border-slate-200 focus:border-indigo-600 text-xs sm:text-sm font-bold outline-none transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setFilterType('all')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filterType === 'all'
                 ? 'bg-slate-900 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            تمام کھاتے ({customers.length})
+            تمام ({customers.length})
           </button>
           <button
             type="button"
             onClick={() => setFilterType('due')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filterType === 'due'
                 ? 'bg-rose-700 text-white shadow-xs'
                 : 'bg-slate-100 text-rose-700 hover:bg-rose-50'
             }`}
           >
-            واجب الادا بقایا دار ({stats.customersWithDue})
+            بقایا دار ({stats.customersWithDue})
           </button>
           <button
             type="button"
             onClick={() => setFilterType('cleared')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filterType === 'cleared'
                 ? 'bg-emerald-700 text-white shadow-xs'
                 : 'bg-slate-100 text-emerald-700 hover:bg-emerald-50'
             }`}
           >
-            صاف کھاتے ({stats.clearedCustomers})
+            صاف ({stats.clearedCustomers})
           </button>
         </div>
       </div>
 
       {/* CUSTOMERS TABLE */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden min-w-0 w-full">
         {filteredCustomers.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <div className="h-16 w-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-              <Icon name="khata" size={32} />
+          <div className="p-8 sm:p-12 text-center space-y-3">
+            <div className="h-14 w-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+              <Icon name="khata" size={28} />
             </div>
             <h3 className="text-base font-black text-slate-800">کوئی کھاتہ دار نہیں ملا</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              تلاش کردہ نام کا کوئی گاہک موجود نہیں ہے، نیا کھاتہ دار شامل کرنے کے لیے اوپر دیے گئے بٹن پر کلک کریں۔
+              تلاش کردہ نام کا کوئی گاہک موجود نہیں ہے۔
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-[680px] sm:min-w-full w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-100/90 text-slate-800 font-black text-xs sm:text-sm border-b border-slate-200 tracking-wider">
                   <th className="py-4 px-4">گاہک (Customer Name)</th>

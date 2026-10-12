@@ -405,18 +405,18 @@ export const BarcodeScannerModal = ({
         </div>
 
         {/* Mode Tabs */}
-        <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-100 rounded-2xl">
+        <div className="grid grid-cols-3 gap-1 sm:gap-2 p-1 sm:p-1.5 bg-slate-100 rounded-xl sm:rounded-2xl">
           <button
             type="button"
             onClick={() => setActiveTab('camera')}
-            className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'camera'
                 ? 'bg-white text-indigo-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Icon name="camera" size={16} />
-            <span>کیمرہ اسکینر</span>
+            <Icon name="camera" size={15} />
+            <span className="truncate">کیمرہ اسکینر</span>
           </button>
           <button
             type="button"
@@ -424,14 +424,14 @@ export const BarcodeScannerModal = ({
               await stopCameraSafe();
               setActiveTab('upload');
             }}
-            className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'upload'
                 ? 'bg-white text-indigo-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Icon name="upload" size={16} />
-            <span>تصویر سے اسکین</span>
+            <Icon name="upload" size={15} />
+            <span className="truncate">تصویر اسکین</span>
           </button>
           <button
             type="button"
@@ -439,14 +439,14 @@ export const BarcodeScannerModal = ({
               await stopCameraSafe();
               setActiveTab('quick');
             }}
-            className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'quick'
                 ? 'bg-white text-indigo-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Icon name="barcode" size={16} />
-            <span>نمبر درج کریں</span>
+            <Icon name="barcode" size={15} />
+            <span className="truncate">نمبر درج</span>
           </button>
         </div>
 

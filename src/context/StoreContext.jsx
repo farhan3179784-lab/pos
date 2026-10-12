@@ -1,21 +1,25 @@
 'use client';
 
-import { createContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { storageService } from '../services/storage.service';
 import { productService } from '../services/product.service';
 import { orderService } from '../services/order.service';
 import { inventoryService } from '../services/inventory.service';
 import { customerService } from '../services/customer.service';
+import { INITIAL_PRODUCTS } from '../data/mock/mockProducts';
+import { INITIAL_CUSTOMERS } from '../data/mock/mockCustomers';
 
 export const StoreContext = createContext(null);
 
 export const StoreProvider = ({ children }) => {
-  const [products, setProducts] = useState(() => storageService.getProducts());
-  const [orders, setOrders] = useState(() => storageService.getOrders());
-  const [inventoryLogs, setInventoryLogs] = useState(() => storageService.getInventoryLogs());
-  const [customers, setCustomers] = useState(() => storageService.getCustomers());
+  // Use static initial values for SSR & first render to ensure 100% hydration match
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [orders, setOrders] = useState([]);
+  const [inventoryLogs, setInventoryLogs] = useState([]);
+  const [customers, setCustomers] = useState(INITIAL_CUSTOMERS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -38,6 +42,17 @@ export const StoreProvider = ({ children }) => {
       setIsLoading(false);
     }
   }, []);
+
+  // Hydrate client state from localStorage immediately on mount, then sync with MongoDB Atlas
+  useEffect(() => {
+    setProducts(storageService.getProducts());
+    setOrders(storageService.getOrders());
+    setInventoryLogs(storageService.getInventoryLogs());
+    setCustomers(storageService.getCustomers());
+    setIsHydrated(true);
+
+    loadData();
+  }, [loadData]);
 
   // Save/Update Product
   const saveProduct = async (productData) => {
@@ -81,10 +96,8 @@ export const StoreProvider = ({ children }) => {
 
   // Create Order from Checkout & handle automatic Khata updating
   const createOrder = async ({ id, createdAt, items, pricing, payment, customer }) => {
-    // 1. Create order record & update product inventory
     const order = await orderService.createOrder({ id, createdAt, items, pricing, payment, customer });
 
-    // 2. If there's an outstanding remaining amount or customer is specified for Khata tracking:
     const remainingDue = Number(payment?.remaining) || 0;
     const isNamedCustomer = customer && customer.name && !customer.name.startsWith('Walk-in');
 
@@ -96,7 +109,7 @@ export const StoreProvider = ({ children }) => {
         customerAddress: customer.address,
         orderId: order.id,
         billTotal: pricing.grandTotal,
-        paidAmount: payment.tendered || (pricing.grandTotal - remainingDue),
+        paidAmount: payment.tendered ?? (pricing.grandTotal - remainingDue),
         creditAmount: remainingDue,
       });
     }
@@ -117,27 +130,40 @@ export const StoreProvider = ({ children }) => {
     await loadData();
   };
 
+  const contextValue = useMemo(
+    () => ({
+      products,
+      orders,
+      inventoryLogs,
+      customers,
+      isLoading,
+      isHydrated,
+      error,
+      refreshData: loadData,
+      saveProduct,
+      deleteProduct,
+      adjustStock,
+      createOrder,
+      saveCustomer,
+      deleteCustomer,
+      recordCustomerPayment,
+      resetProducts,
+      resetCustomers,
+    }),
+    [
+      products,
+      orders,
+      inventoryLogs,
+      customers,
+      isLoading,
+      isHydrated,
+      error,
+      loadData,
+    ]
+  );
+
   return (
-    <StoreContext.Provider
-      value={{
-        products,
-        orders,
-        inventoryLogs,
-        customers,
-        isLoading,
-        error,
-        refreshData: loadData,
-        saveProduct,
-        deleteProduct,
-        adjustStock,
-        createOrder,
-        saveCustomer,
-        deleteCustomer,
-        recordCustomerPayment,
-        resetProducts,
-        resetCustomers,
-      }}
-    >
+    <StoreContext.Provider value={contextValue}>
       {children}
     </StoreContext.Provider>
   );

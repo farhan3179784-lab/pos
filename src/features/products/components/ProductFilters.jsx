@@ -16,23 +16,23 @@ export const ProductFilters = ({
   onViewModeChange,
 }) => {
   return (
-    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row gap-3.5 items-stretch md:items-center justify-between">
-      {/* Search Input (Larger) */}
-      <div className="w-full md:w-80">
+    <div className="bg-white p-3 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col lg:flex-row gap-2.5 sm:gap-3.5 items-stretch lg:items-center justify-between">
+      {/* Search Input */}
+      <div className="w-full lg:w-80 shrink-0">
         <Input
           name="productSearch"
           placeholder="🔍 پروڈکٹ کا نام یا بار کوڈ..."
           icon="search"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="text-sm sm:text-base font-bold py-2.5"
+          className="text-sm sm:text-base font-bold py-2 sm:py-2.5"
         />
       </div>
 
       {/* Filters & Sorters */}
-      <div className="flex flex-wrap items-center gap-2.5 flex-1 justify-end">
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 w-full lg:w-auto lg:justify-end">
         {/* Category Filter */}
-        <div className="w-40 sm:w-48">
+        <div className="col-span-1 sm:w-44">
           <Select
             name="categoryFilter"
             value={selectedCategory}
@@ -43,13 +43,13 @@ export const ProductFilters = ({
         </div>
 
         {/* Stock Status Filter */}
-        <div className="w-36 sm:w-40">
+        <div className="col-span-1 sm:w-36">
           <Select
             name="stockFilter"
             value={stockFilter}
             onChange={(e) => onStockFilterChange(e.target.value)}
             options={[
-              { value: 'all', label: 'تمام اسٹاک (All)' },
+              { value: 'all', label: 'تمام اسٹاک' },
               { value: 'in_stock', label: 'موجود (In Stock)' },
               { value: 'low_stock', label: 'کم اسٹاک (Low)' },
               { value: 'out_of_stock', label: 'ختم (Out of Stock)' },
@@ -59,7 +59,7 @@ export const ProductFilters = ({
         </div>
 
         {/* Sort Options */}
-        <div className="w-40 sm:w-48">
+        <div className="col-span-2 sm:col-span-1 sm:w-44">
           <Select
             name="sortOption"
             value={sortOption}
@@ -70,7 +70,7 @@ export const ProductFilters = ({
         </div>
 
         {/* Grid/Table View Toggle */}
-        <div className="hidden sm:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <div className="hidden sm:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
           <button
             type="button"
             onClick={() => onViewModeChange('table')}

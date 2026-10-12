@@ -17,7 +17,7 @@ import { generateOrderId } from '../utils/idGenerator';
 import { matchesProduct } from '../utils/searchMatcher';
 
 export const BillingPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     products,
     isLoading,
@@ -446,46 +446,46 @@ export const BillingPage = () => {
       {/* ---------------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
         {/* Module Header Bar */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-indigo-100 text-indigo-700 shadow-xs">
-              <Icon name="billing" size={24} />
+        <div className="p-3 sm:p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="p-2 rounded-xl bg-indigo-100 text-indigo-700 shadow-xs shrink-0">
+              <Icon name="billing" size={20} />
             </span>
-            <div>
-              <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-xl font-black text-slate-900 tracking-tight truncate">
                 POS Billing Counter (بل کاؤنٹر)
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+              <p className="text-[10px] sm:text-sm text-slate-500 font-medium truncate">
                 بار کوڈ اسکین کریں یا پروڈکٹ تلاش کر کے فوری کسٹمر سلپ بنائیں
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-            <span className="px-3 py-1.5 rounded-xl bg-slate-100 font-extrabold text-xs sm:text-sm text-slate-700">
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+            <span className="px-2.5 py-1 rounded-lg sm:rounded-xl bg-slate-100 font-extrabold text-[11px] sm:text-sm text-slate-700">
               کل آئٹمز: {billItems.length}
             </span>
             <button
               type="button"
               onClick={() => router.push('/sales')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-extrabold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
               title="پچھلے تمام بل اور فروخت کی تفصیلات دیکھیں"
             >
-              <Icon name="history" size={16} />
+              <Icon name="history" size={15} />
               <span>سیلز ہسٹری</span>
             </button>
             <button
               type="button"
               onClick={() => router.push('/products')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
-              <span>پروڈکٹس مینیجر</span>
+              <span>پروڈکٹس</span>
               <span className="text-slate-400">→</span>
             </button>
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-6">
+        <div className="p-2.5 sm:p-6 space-y-4 sm:space-y-6">
           {products.length === 0 && (
             <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-950 text-xs sm:text-sm font-bold shadow-xs">
               <div className="flex items-center gap-2.5">
@@ -620,9 +620,9 @@ export const BillingPage = () => {
           </div>
 
           {/* CURRENT BILL ITEMS TABLE */}
-          <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+          <div className="border border-slate-200 rounded-xl sm:rounded-2xl overflow-hidden shadow-xs min-w-0 w-full">
+            <div className="overflow-x-auto w-full">
+              <table className="min-w-[620px] sm:min-w-full w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-100/90 text-slate-800 font-black text-xs sm:text-sm border-b border-slate-200 uppercase tracking-wider">
                     <th className="py-3.5 px-3 w-12 text-center">#</th>
@@ -763,35 +763,35 @@ export const BillingPage = () => {
           </div>
 
           {/* TOTALS & ACTIONS ROW */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-6 items-start pt-1">
             {/* Left: Customer Selection, Extra Discount & Cash Tendered */}
-            <div className="lg:col-span-6 bg-slate-50 p-5 rounded-2xl border border-slate-200/90 space-y-4">
+            <div className="lg:col-span-6 bg-slate-50 p-2 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/90 space-y-2.5 sm:space-y-4">
               
               {/* CUSTOMER & KHATA SECTION */}
-              <div className="p-4 bg-white rounded-xl border border-slate-200/90 shadow-2xs space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700">
-                      <Icon name="khata" size={18} />
+              <div className="p-2 sm:p-4 bg-white rounded-xl border border-slate-200/90 shadow-2xs space-y-2 sm:space-y-3">
+                <div className="flex items-center justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="p-1 rounded-lg bg-indigo-50 text-indigo-700 shrink-0">
+                      <Icon name="khata" size={15} />
                     </span>
-                    <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">
-                      گاہک اور کھاتہ (Customer & Khata)
+                    <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide truncate">
+                      گاہک اور کھاتہ (Khata)
                     </h3>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsNewCustomerModalOpen(true)}
-                    className="flex items-center gap-1 text-[11px] font-black text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] font-black text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded-lg transition-colors cursor-pointer shrink-0 active:scale-95"
                   >
-                    <Icon name="plus" size={13} />
+                    <Icon name="plus" size={12} />
                     <span>+ نیا کھاتہ دار</span>
                   </button>
                 </div>
 
                 {/* Customer Dropdown Selector */}
                 <div>
-                  <label className="text-[11px] font-bold text-slate-500 block mb-1">
-                    کھاتہ دار منتخب کریں (Select Existing Khata Customer):
+                  <label className="text-[10px] sm:text-[11px] font-bold text-slate-500 block mb-1">
+                    کھاتہ دار منتخب کریں (Select Khata Customer):
                   </label>
                   <select
                     value={selectedCustomerId}
@@ -808,14 +808,14 @@ export const BillingPage = () => {
                         setCustomCustomerPhone('');
                       }
                     }}
-                    className="w-full text-xs sm:text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:border-indigo-600 text-slate-900 cursor-pointer"
+                    className="w-full text-xs font-bold bg-slate-50/70 border border-slate-200 rounded-lg sm:rounded-xl p-2 sm:p-2.5 outline-none focus:border-indigo-600 text-slate-900 cursor-pointer"
                   >
-                    <option value="">کاؤنٹر گاہک (نقد / Walk-in Customer)</option>
+                    <option value="">کاؤنٹر گاہک (نقد - Walk-in)</option>
                     {customers.map((c) => {
                       const bal = Number(c.currentBalance) || 0;
                       return (
                         <option key={c.id} value={c.id}>
-                          {c.name} {c.phone ? `(${c.phone})` : ''} — {bal > 0 ? `سابقہ ادھار: Rs. ${bal}` : 'صاف کھاتہ ✓'}
+                          {c.name} {bal > 0 ? `(ادھار: Rs. ${bal})` : '(صاف کھاتہ ✓)'}
                         </option>
                       );
                     })}
@@ -824,24 +824,24 @@ export const BillingPage = () => {
 
                 {/* If Khata Customer Selected: Show Profile Card */}
                 {selectedCustomer ? (
-                  <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl flex items-center justify-between animate-fadeIn">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm text-indigo-950">
+                  <div className="p-2 sm:p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl flex items-center justify-between gap-2 animate-fadeIn">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="font-extrabold text-xs sm:text-sm text-indigo-950 truncate">
                           {selectedCustomer.name}
                         </span>
                         {selectedCustomer.phone && (
-                          <span className="text-[11px] font-mono text-indigo-700 font-bold" dir="ltr">
+                          <span className="text-[10px] sm:text-[11px] font-mono text-indigo-700 font-bold shrink-0" dir="ltr">
                             {selectedCustomer.phone}
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-600 font-medium mt-0.5">
-                        سابقہ کھاتہ بیلنس:
+                      <div className="text-[10px] sm:text-[11px] text-slate-600 font-medium mt-0.5 truncate">
+                        سابقہ بیلنس:
                         <strong className={`font-mono text-xs ml-1 ${customerPrevBalance > 0 ? 'text-rose-700' : 'text-emerald-700'}`}>
                           {formatCurrency(customerPrevBalance)}
                         </strong>
-                        {customerPrevBalance > 0 ? ' (واجب الادا ادھار)' : ' (کلیئر)'}
+                        {customerPrevBalance > 0 ? ' (ادھار)' : ' (صاف)'}
                       </div>
                     </div>
 
@@ -852,7 +852,7 @@ export const BillingPage = () => {
                         setCustomCustomerName('');
                         setCustomCustomerPhone('');
                       }}
-                      className="text-xs font-bold text-rose-600 hover:text-rose-800 p-1 rounded-lg hover:bg-rose-50 cursor-pointer"
+                      className="text-xs font-bold text-rose-600 hover:text-rose-800 p-1 rounded-lg hover:bg-rose-50 cursor-pointer shrink-0"
                       title="گاہک کا انتخاب ختم کریں"
                     >
                       ✕ ہٹائیں
@@ -860,14 +860,14 @@ export const BillingPage = () => {
                   </div>
                 ) : (
                   /* Custom Name & Phone input for Walk-in or one-off customers */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 pt-0.5">
                     <div>
                       <input
                         type="text"
                         placeholder="گاہک کا نام (اختیاری)"
                         value={customCustomerName}
                         onChange={(e) => setCustomCustomerName(e.target.value)}
-                        className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:border-indigo-600"
+                        className="w-full text-xs font-bold bg-white border border-slate-200 rounded-lg sm:rounded-xl p-2 sm:p-2.5 outline-none focus:border-indigo-600"
                       />
                     </div>
                     <div>
@@ -876,7 +876,7 @@ export const BillingPage = () => {
                         placeholder="موبائل نمبر (اختیاری)"
                         value={customCustomerPhone}
                         onChange={(e) => setCustomCustomerPhone(e.target.value)}
-                        className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:border-indigo-600 font-mono"
+                        className="w-full text-xs font-bold bg-white border border-slate-200 rounded-lg sm:rounded-xl p-2 sm:p-2.5 outline-none focus:border-indigo-600 font-mono"
                         dir="ltr"
                       />
                     </div>
@@ -885,19 +885,19 @@ export const BillingPage = () => {
               </div>
 
               {/* PAYMENT INPUTS */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">
-                  ادائیگی کی تفصیلات (Cash & Payment)
+                  ادائیگی کی تفصیلات (Payment)
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
                   {/* Overall Discount */}
                   <div>
-                    <label className="text-xs font-extrabold text-slate-700 block mb-1">
-                      اضافی بل رعایت (Discount Rs.)
+                    <label className="text-[10px] sm:text-xs font-extrabold text-slate-700 block mb-1 truncate">
+                      رعایت (Discount Rs.)
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm">
+                      <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-bold text-[11px] sm:text-xs">
                         Rs.
                       </span>
                       <input
@@ -906,18 +906,18 @@ export const BillingPage = () => {
                         value={overallDiscount}
                         onChange={(e) => setOverallDiscount(e.target.value)}
                         placeholder="0"
-                        className="w-full pl-10 pr-3 py-2.5 bg-white rounded-xl border-2 border-slate-300 text-sm font-black text-slate-900 outline-none focus:border-indigo-600"
+                        className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2.5 bg-white rounded-lg sm:rounded-xl border border-slate-300 text-xs sm:text-sm font-black text-slate-900 outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
                       />
                     </div>
                   </div>
 
                   {/* Cash Tendered */}
                   <div>
-                    <label className="text-xs font-extrabold text-slate-700 block mb-1">
-                      وصول شدہ کیش (Cash Received)
+                    <label className="text-[10px] sm:text-xs font-extrabold text-slate-700 block mb-1 truncate">
+                      وصول شدہ کیش (Cash)
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm">
+                      <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-bold text-[11px] sm:text-xs">
                         Rs.
                       </span>
                       <input
@@ -926,7 +926,7 @@ export const BillingPage = () => {
                         value={cashTendered}
                         onChange={(e) => setCashTendered(e.target.value)}
                         placeholder={netPayable.toString()}
-                        className="w-full pl-10 pr-3 py-2.5 bg-white rounded-xl border-2 border-slate-300 text-sm font-black text-slate-900 outline-none focus:border-indigo-600"
+                        className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2.5 bg-white rounded-lg sm:rounded-xl border border-slate-300 text-xs sm:text-sm font-black text-slate-900 outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
                       />
                     </div>
                   </div>
@@ -934,31 +934,31 @@ export const BillingPage = () => {
 
                 {/* Quick Cash Buttons */}
                 <div>
-                  <span className="text-xs text-slate-500 font-bold block mb-1.5">
+                  <span className="text-[10px] sm:text-xs text-slate-500 font-bold block mb-1.5">
                     فوری رقم بٹن (Quick Cash):
                   </span>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
                     <button
                       type="button"
                       onClick={() => setCashTendered(netPayable.toString())}
-                      className="px-3 py-1.5 text-xs font-black bg-white hover:bg-slate-200 border-2 border-slate-300 rounded-xl text-slate-800 cursor-pointer"
+                      className="px-1.5 py-1.5 sm:py-2 text-[11px] font-black bg-white hover:bg-slate-100 active:bg-slate-200 border border-slate-300 rounded-lg sm:rounded-xl text-slate-800 cursor-pointer text-center truncate shadow-2xs"
                     >
-                      برابر (Exact: Rs. {netPayable})
+                      برابر ({netPayable})
                     </button>
                     <button
                       type="button"
                       onClick={() => setCashTendered('0')}
-                      className="px-3 py-1.5 text-xs font-black bg-rose-50 hover:bg-rose-100 border-2 border-rose-300 rounded-xl text-rose-800 cursor-pointer"
+                      className="px-1.5 py-1.5 sm:py-2 text-[11px] font-black bg-rose-50 hover:bg-rose-100 active:bg-rose-200 border border-rose-300 rounded-lg sm:rounded-xl text-rose-800 cursor-pointer text-center truncate shadow-2xs"
                       title="تمام بل ادھار پر رکھیں"
                     >
-                      ادھار (Rs. 0 نقد)
+                      ادھار (Rs. 0)
                     </button>
                     {[500, 1000, 2000, 5000].map((amt) => (
                       <button
                         key={amt}
                         type="button"
                         onClick={() => setCashTendered(amt.toString())}
-                        className="px-3 py-1.5 text-xs font-black bg-white hover:bg-slate-200 border-2 border-slate-300 rounded-xl text-slate-800 cursor-pointer"
+                        className="px-1.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono font-black bg-white hover:bg-indigo-50 hover:border-indigo-300 active:bg-indigo-100 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 cursor-pointer text-center shadow-2xs"
                       >
                         Rs. {amt}
                       </button>
@@ -968,20 +968,20 @@ export const BillingPage = () => {
 
                 {/* KHATA DUE / BAQAYA ALERT BOX */}
                 {billRemaining > 0 && (
-                  <div className="p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl space-y-2 animate-fadeIn">
+                  <div className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl space-y-1.5 animate-fadeIn">
                     <div className="flex items-center justify-between text-amber-950 font-bold text-xs sm:text-sm">
                       <span className="flex items-center gap-1.5">
                         <Icon name="warning" size={16} className="text-amber-700" />
-                        <span>اس بل کا بقایا (Unpaid Udhaar):</span>
+                        <span>اس بل کا بقایا (Udhaar):</span>
                       </span>
-                      <span className="font-mono font-black text-rose-700 text-base">
+                      <span className="font-mono font-black text-rose-700 text-sm sm:text-base">
                         {formatCurrency(billRemaining)}
                       </span>
                     </div>
 
                     {customerPrevBalance > 0 && (
-                      <div className="flex justify-between items-center text-slate-700 text-xs font-medium border-t border-amber-200 pt-1.5">
-                        <span>سابقہ کھاتہ بقایا (Previous Khata):</span>
+                      <div className="flex justify-between items-center text-slate-700 text-[11px] sm:text-xs font-medium border-t border-amber-200 pt-1">
+                        <span>سابقہ کھاتہ (Prev Khata):</span>
                         <span className="font-mono font-bold text-slate-900">
                           {formatCurrency(customerPrevBalance)}
                         </span>
@@ -989,14 +989,10 @@ export const BillingPage = () => {
                     )}
 
                     <div className="flex justify-between items-center text-slate-900 font-black text-xs sm:text-sm pt-1 border-t border-amber-300">
-                      <span>کل نیا واجب الادا کھاتہ (Total Khata Balance):</span>
-                      <span className="font-mono text-base sm:text-lg text-rose-800">
+                      <span>کل نیا واجب الادا:</span>
+                      <span className="font-mono text-sm sm:text-base text-rose-800">
                         {formatCurrency(totalKhataBalanceAfter)}
                       </span>
-                    </div>
-
-                    <div className="text-[11px] text-amber-900 font-bold bg-amber-100/70 p-2 rounded-lg text-center">
-                      ✓ یہ بقایا رقم گاہک کے کھاتے میں خود بخود درج ہو جائے گی اور سلپ پر بھی پرنٹ ہوگی۔
                     </div>
                   </div>
                 )}
@@ -1004,45 +1000,45 @@ export const BillingPage = () => {
             </div>
 
             {/* Right: Net Payable Summary & Main Action Buttons */}
-            <div className="lg:col-span-6 bg-slate-950 text-white p-6 rounded-2xl shadow-xl space-y-4">
-              <div className="space-y-2.5 border-b border-slate-800 pb-4 text-sm sm:text-base">
+            <div className="lg:col-span-6 bg-slate-950 text-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl shadow-xl space-y-3 sm:space-y-4">
+              <div className="space-y-2 border-b border-slate-800 pb-3 text-xs sm:text-base">
                 <div className="flex justify-between text-slate-400">
                   <span>کل رقم (Subtotal):</span>
-                  <span className="font-mono font-black text-white text-base">
+                  <span className="font-mono font-black text-white text-sm sm:text-base">
                     {formatCurrency(subtotal)}
                   </span>
                 </div>
                 {totalDiscount > 0 && (
                   <div className="flex justify-between text-amber-400 font-bold">
-                    <span>کل رعایت (Total Discount):</span>
-                    <span className="font-mono text-base">-{formatCurrency(totalDiscount)}</span>
+                    <span>کل رعایت (Discount):</span>
+                    <span className="font-mono text-sm sm:text-base">-{formatCurrency(totalDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-slate-400">
                   <span>وصول شدہ رقم (Received):</span>
-                  <span className="font-mono text-white text-base">
+                  <span className="font-mono text-white text-sm sm:text-base">
                     {isTenderedExplicit ? formatCurrency(tenderedAmount) : `${formatCurrency(netPayable)} (پورا کیش)`}
                   </span>
                 </div>
                 {changeDue > 0 && (
                   <div className="flex justify-between text-emerald-400 font-black">
-                    <span>بقایا واپسی رقم (Change Due):</span>
-                    <span className="font-mono text-lg">{formatCurrency(changeDue)}</span>
+                    <span>بقایا واپسی (Change):</span>
+                    <span className="font-mono text-base sm:text-lg">{formatCurrency(changeDue)}</span>
                   </div>
                 )}
 
                 {/* If Udhaar / Khata remaining on this bill */}
                 {billRemaining > 0 && (
-                  <div className="flex justify-between text-rose-400 font-black border-t border-slate-800 pt-2">
+                  <div className="flex justify-between text-rose-400 font-black border-t border-slate-800 pt-1.5">
                     <span>اس بل کا بقایا (Credit Due):</span>
-                    <span className="font-mono text-lg text-rose-400">{formatCurrency(billRemaining)}</span>
+                    <span className="font-mono text-base sm:text-lg text-rose-400">{formatCurrency(billRemaining)}</span>
                   </div>
                 )}
 
                 {totalKhataBalanceAfter > 0 && billRemaining > 0 && (
-                  <div className="flex justify-between text-amber-300 font-bold text-xs">
-                    <span>کل کھاتہ واجب الادا (Net Khata Balance):</span>
-                    <span className="font-mono text-sm text-amber-300">{formatCurrency(totalKhataBalanceAfter)}</span>
+                  <div className="flex justify-between text-amber-300 font-bold text-[11px] sm:text-xs">
+                    <span>کل کھاتہ واجب الادا (Net Khata):</span>
+                    <span className="font-mono text-xs sm:text-sm text-amber-300">{formatCurrency(totalKhataBalanceAfter)}</span>
                   </div>
                 )}
               </div>
@@ -1050,38 +1046,38 @@ export const BillingPage = () => {
               {/* Big Net Payable Amount */}
               <div className="flex items-baseline justify-between pt-1">
                 <div>
-                  <span className="text-xs sm:text-sm font-bold text-slate-400 block uppercase">
+                  <span className="text-[11px] sm:text-sm font-bold text-slate-400 block uppercase">
                     صافی قابل ادائیگی
                   </span>
-                  <span className="text-base sm:text-lg font-bold font-urdu text-indigo-300">
+                  <span className="text-sm sm:text-lg font-bold font-urdu text-indigo-300">
                     Net Payable
                   </span>
                 </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-400 font-mono tracking-tight">
+                <div className="text-2xl sm:text-4xl lg:text-5xl font-black text-emerald-400 font-mono tracking-tight">
                   {formatCurrency(netPayable)}
                 </div>
               </div>
 
               {/* PRIMARY ACTION BUTTONS */}
-              <div className="grid grid-cols-2 gap-3.5 pt-2">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3.5 pt-1 sm:pt-2">
                 {/* RESET BUTTON */}
                 <button
                   type="button"
                   onClick={handleResetBill}
-                  className="w-full py-3.5 px-4 rounded-xl font-black text-sm sm:text-base bg-rose-950/90 hover:bg-rose-900 text-rose-200 border border-rose-800 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-md"
+                  className="w-full py-2.5 sm:py-3.5 px-2.5 sm:px-4 rounded-xl font-black text-xs sm:text-base bg-rose-950/90 hover:bg-rose-900 text-rose-200 border border-rose-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-md"
                 >
-                  <Icon name="delete" size={18} />
-                  <span>ری سیٹ (New Bill)</span>
+                  <Icon name="delete" size={16} />
+                  <span>ری سیٹ (New)</span>
                 </button>
 
                 {/* PRINT SLIP BUTTON */}
                 <button
                   type="button"
                   onClick={handlePrintSlip}
-                  className="w-full py-3.5 px-4 rounded-xl font-black text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-lg shadow-emerald-950/50"
+                  className="w-full py-2.5 sm:py-3.5 px-2.5 sm:px-4 rounded-xl font-black text-xs sm:text-base bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-lg shadow-emerald-950/50"
                 >
-                  <Icon name="printer" size={20} />
-                  <span>پرنٹ سلپ (Print Slip)</span>
+                  <Icon name="printer" size={18} />
+                  <span>پرنٹ سلپ (Print)</span>
                 </button>
               </div>
             </div>

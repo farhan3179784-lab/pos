@@ -78,54 +78,54 @@ export const ProductsPage = () => {
         </div>
       )}
 
-      {/* Header Bar (Large, Clear Fonts) */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
+      {/* Header Bar */}
+      <div className="bg-white rounded-2xl p-3.5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
           <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-              <Icon name="products" size={24} />
+            <span className="p-2 rounded-xl bg-indigo-100 text-indigo-700 shrink-0">
+              <Icon name="products" size={22} />
             </span>
-            <div>
-              <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
-                پروڈکٹس مینیجر اور اسٹاک (Product Management)
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-black text-slate-900 tracking-tight truncate">
+                پروڈکٹس مینیجر اور اسٹاک
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+              <p suppressHydrationWarning className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5 truncate">
                 کل {products.length} پروڈکٹس رجسٹرڈ ہیں • نیا سامان شامل کریں، قیمت اور اسٹاک تبدیل کریں
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full md:w-auto">
           <Button
             variant="secondary"
-            size="md"
+            size="sm"
             icon="billing"
             onClick={() => router.push('/billing')}
-            className="text-xs sm:text-sm font-extrabold"
+            className="col-span-1 text-xs font-extrabold justify-center"
           >
-            بل کاؤنٹر (POS Billing)
+            بل کاؤنٹر
           </Button>
 
           <Button
             variant="secondary"
-            size="md"
+            size="sm"
             icon="history"
             onClick={() => router.push('/sales')}
-            className="text-xs sm:text-sm font-extrabold"
+            className="col-span-1 text-xs font-extrabold justify-center"
           >
-            سیلز ہسٹری (Sales)
+            سیلز ہسٹری
           </Button>
 
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             icon="plus"
             onClick={() => {
               setEditingProduct(null);
               setIsFormModalOpen(true);
             }}
-            className="text-xs sm:text-sm font-extrabold"
+            className="col-span-2 sm:col-span-1 text-xs font-extrabold justify-center"
           >
             نیا پروڈکٹ (+ Add)
           </Button>
