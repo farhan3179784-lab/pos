@@ -17,7 +17,7 @@ import { generateOrderId } from '../utils/idGenerator';
 import { matchesProduct } from '../utils/searchMatcher';
 
 export const BillingPage = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const {
     products,
     isLoading,
