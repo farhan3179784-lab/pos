@@ -11,8 +11,11 @@ const STORAGE_KEYS = {
   INITIALIZED: 'fusion_pos_initialized_v4',
 };
 
+const isClient = typeof window !== 'undefined';
+
 export const storageService = {
   getProducts() {
+    if (!isClient) return INITIAL_PRODUCTS;
     try {
       const isInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
       const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
@@ -61,6 +64,7 @@ export const storageService = {
   },
 
   setProducts(products) {
+    if (!isClient) return;
     try {
       const clean = Array.isArray(products) ? products : [];
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(clean));
@@ -75,6 +79,7 @@ export const storageService = {
   },
 
   resetToDefaultProducts() {
+    if (!isClient) return INITIAL_PRODUCTS;
     try {
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
       localStorage.removeItem('fusion_pos_cleared_by_user');
@@ -85,6 +90,7 @@ export const storageService = {
   },
 
   getOrders() {
+    if (!isClient) return [];
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ORDERS);
       if (!data) {
@@ -98,6 +104,7 @@ export const storageService = {
   },
 
   setOrders(orders) {
+    if (!isClient) return;
     try {
       localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
     } catch (e) {
@@ -106,6 +113,7 @@ export const storageService = {
   },
 
   getInventoryLogs() {
+    if (!isClient) return [];
     try {
       const data = localStorage.getItem(STORAGE_KEYS.INVENTORY_LOGS);
       if (!data) {
@@ -119,6 +127,7 @@ export const storageService = {
   },
 
   setInventoryLogs(logs) {
+    if (!isClient) return;
     try {
       localStorage.setItem(STORAGE_KEYS.INVENTORY_LOGS, JSON.stringify(logs));
     } catch (e) {
@@ -127,6 +136,7 @@ export const storageService = {
   },
 
   getCustomers() {
+    if (!isClient) return INITIAL_CUSTOMERS;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
       if (!data) {
@@ -145,6 +155,7 @@ export const storageService = {
   },
 
   setCustomers(customers) {
+    if (!isClient) return;
     try {
       const clean = Array.isArray(customers) ? customers : [];
       localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(clean));
@@ -154,6 +165,7 @@ export const storageService = {
   },
 
   resetToDefaultCustomers() {
+    if (!isClient) return INITIAL_CUSTOMERS;
     try {
       localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
       return INITIAL_CUSTOMERS;

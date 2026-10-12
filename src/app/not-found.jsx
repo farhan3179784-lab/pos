@@ -1,0 +1,24 @@
+'use client';
+
+import Link from 'next/link';
+import { Button } from '../components/ui/Button';
+import { Icon } from '../components/ui/Icon';
+
+export default function NotFound() {
+  return (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
+      <div className="h-16 w-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 shadow-sm">
+        <Icon name="error" size={32} />
+      </div>
+      <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">404 - Page Not Found</h2>
+      <p className="text-sm text-slate-500 max-w-sm mt-1 mb-6">
+        The POS or administration screen you requested does not exist or has been moved.
+      </p>
+      <Link href="/billing">
+        <Button variant="primary" size="md" icon="dashboard">
+          Back to POS Billing
+        </Button>
+      </Link>
+    </div>
+  );
+}

@@ -1,11 +1,14 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Icon } from '../ui/Icon';
 import { formatDate, formatTime } from '../../utils/date';
 
-export const AdminLayout = () => {
+export const AdminLayout = ({ children }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const location = useLocation();
+  const pathname = usePathname() || '/billing';
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentDateTime(new Date()), 10000);
@@ -13,8 +16,15 @@ export const AdminLayout = () => {
   }, []);
 
   const handleTriggerScanner = () => {
-    window.dispatchEvent(new CustomEvent('open-pos-scanner'));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('open-pos-scanner'));
+    }
   };
+
+  const isBillingActive = pathname === '/billing' || pathname === '/';
+  const isSalesActive = pathname.startsWith('/sales') || pathname.startsWith('/orders') || pathname.startsWith('/history');
+  const isKhataActive = pathname.startsWith('/khata') || pathname.startsWith('/customers') || pathname.startsWith('/ledger');
+  const isProductsActive = pathname.startsWith('/products');
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col antialiased text-slate-900 font-sans">
@@ -49,61 +59,53 @@ export const AdminLayout = () => {
 
           {/* Center: Main Navigation Tabs */}
           <nav className="flex items-center gap-1.5 sm:gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-            <NavLink
-              to="/billing"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  isActive || location.pathname === '/'
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
-                }`
-              }
+            <Link
+              href="/billing"
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                isBillingActive
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
             >
               <Icon name="billing" size={18} />
               <span>بل کاؤنٹر (POS Billing)</span>
-            </NavLink>
+            </Link>
 
-            <NavLink
-              to="/sales"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
-                }`
-              }
+            <Link
+              href="/sales"
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                isSalesActive
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
             >
               <Icon name="history" size={18} />
               <span>سیلز ہسٹری (Sales History)</span>
-            </NavLink>
+            </Link>
 
-            <NavLink
-              to="/khata"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
-                }`
-              }
+            <Link
+              href="/khata"
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                isKhataActive
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
             >
               <Icon name="khata" size={18} />
               <span>گاہک کھاتہ (Khata Ledger)</span>
-            </NavLink>
+            </Link>
 
-            <NavLink
-              to="/products"
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
-                }`
-              }
+            <Link
+              href="/products"
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                isProductsActive
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
             >
               <Icon name="products" size={18} />
               <span>پروڈکٹس مینیجر (Products)</span>
-            </NavLink>
+            </Link>
           </nav>
 
           {/* Right: Camera Scanner Trigger Button */}
@@ -127,7 +129,7 @@ export const AdminLayout = () => {
 
       {/* MAIN VIEW AREA */}
       <main className="flex-1 w-full max-w-[1600px] mx-auto p-3 sm:p-5 lg:p-6">
-        <Outlet />
+        {children}
       </main>
     </div>
   );

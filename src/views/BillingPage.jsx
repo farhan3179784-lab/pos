@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useStore } from '../hooks/useStore';
 import { Icon } from '../components/ui/Icon';
 import { Modal } from '../components/ui/Modal';
@@ -15,7 +17,7 @@ import { generateOrderId } from '../utils/idGenerator';
 import { matchesProduct } from '../utils/searchMatcher';
 
 export const BillingPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     products,
     isLoading,
@@ -465,7 +467,7 @@ export const BillingPage = () => {
             </span>
             <button
               type="button"
-              onClick={() => navigate('/sales')}
+              onClick={() => router.push('/sales')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
               title="پچھلے تمام بل اور فروخت کی تفصیلات دیکھیں"
             >
@@ -474,7 +476,7 @@ export const BillingPage = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/products')}
+              onClick={() => router.push('/products')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               <span>پروڈکٹس مینیجر</span>

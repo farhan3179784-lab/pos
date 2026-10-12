@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { Button } from '../components/ui/Button';
 import { Icon } from '../components/ui/Icon';
 

@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useStore } from '../hooks/useStore';
 import { Icon } from '../components/ui/Icon';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -12,7 +14,7 @@ import { ProductSalesModal } from '../features/sales/components/ProductSalesModa
 import { matchesProduct } from '../utils/searchMatcher';
 
 export const SalesHistoryPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { orders, products, isLoading } = useStore();
 
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'products'
@@ -226,7 +228,7 @@ export const SalesHistoryPage = () => {
         <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
           <button
             type="button"
-            onClick={() => navigate('/billing')}
+            onClick={() => router.push('/billing')}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs sm:text-sm shadow-sm transition-all cursor-pointer"
           >
             <Icon name="billing" size={18} />

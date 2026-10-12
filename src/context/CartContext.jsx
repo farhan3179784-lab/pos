@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useState, useMemo } from 'react';
 import { calculateCartTotals } from '../utils/posCalculations';
 import { useStore } from '../hooks/useStore';

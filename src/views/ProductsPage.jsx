@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -16,7 +18,7 @@ import { Icon } from '../components/ui/Icon';
 import { matchesProduct } from '../utils/searchMatcher';
 
 export const ProductsPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { products, orders, isLoading, saveProduct, deleteProduct, resetProducts } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,7 +101,7 @@ export const ProductsPage = () => {
             variant="secondary"
             size="md"
             icon="billing"
-            onClick={() => navigate('/billing')}
+            onClick={() => router.push('/billing')}
             className="text-xs sm:text-sm font-extrabold"
           >
             بل کاؤنٹر (POS Billing)
@@ -109,7 +111,7 @@ export const ProductsPage = () => {
             variant="secondary"
             size="md"
             icon="history"
-            onClick={() => navigate('/sales')}
+            onClick={() => router.push('/sales')}
             className="text-xs sm:text-sm font-extrabold"
           >
             سیلز ہسٹری (Sales)
@@ -175,7 +177,7 @@ export const ProductsPage = () => {
           onAddToCart={(prod) => {
             // When clicked on products page, dispatch event and navigate to billing
             window.dispatchEvent(new CustomEvent('pos-barcode-scanned', { detail: prod }));
-            navigate('/billing');
+            router.push('/billing');
           }}
           onEdit={(prod) => {
             setEditingProduct(prod);
@@ -192,7 +194,7 @@ export const ProductsPage = () => {
               product={product}
               onAddToCart={(prod) => {
                 window.dispatchEvent(new CustomEvent('pos-barcode-scanned', { detail: prod }));
-                navigate('/billing');
+                router.push('/billing');
               }}
               onEdit={(prod) => {
                 setEditingProduct(prod);

@@ -1,4 +1,6 @@
-import { createContext, useState, useCallback } from 'react';
+'use client';
+
+import { createContext, useState, useCallback, useMemo } from 'react';
 import { storageService } from '../services/storage.service';
 import { productService } from '../services/product.service';
 import { orderService } from '../services/order.service';

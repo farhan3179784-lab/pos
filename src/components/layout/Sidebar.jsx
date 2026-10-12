@@ -1,8 +1,13 @@
-import { NavLink } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Icon } from '../ui/Icon';
 import { NAV_ITEMS } from '../../constants/navigation';
 
 export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMobile }) => {
+  const pathname = usePathname();
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -22,7 +27,7 @@ export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
         <div>
           {/* Logo & Brand Header */}
           <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100">
-            <NavLink to="/products" className="flex items-center gap-3 overflow-hidden cursor-pointer group">
+            <Link href="/products" className="flex items-center gap-3 overflow-hidden cursor-pointer group">
               <div className="h-10 w-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-lg shrink-0 shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
                 F
               </div>
@@ -36,7 +41,7 @@ export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
                   </span>
                 </div>
               )}
-            </NavLink>
+            </Link>
 
             {/* Mobile close button */}
             <button
@@ -50,40 +55,37 @@ export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
 
           {/* Navigation Items */}
           <nav className="p-3 space-y-1">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={onCloseMobile}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+            {NAV_ITEMS.map((item) => {
+              const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  onClick={onCloseMobile}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
                     isActive
                       ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon
-                      name={item.icon}
-                      size={18}
-                      className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}
-                    />
-                    {!isCollapsed && (
-                      <div className="flex-1 truncate flex items-center justify-between">
-                        <span>{item.label}</span>
-                        {item.labelUrdu && (
-                          <span className={`text-[11px] font-urdu font-bold ${isActive ? 'text-indigo-200' : 'text-slate-400'}`}>
-                            {item.labelUrdu}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
+                  }`}
+                >
+                  <Icon
+                    name={item.icon}
+                    size={18}
+                    className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}
+                  />
+                  {!isCollapsed && (
+                    <div className="flex-1 truncate flex items-center justify-between">
+                      <span>{item.label}</span>
+                      {item.labelUrdu && (
+                        <span className={`text-[11px] font-urdu font-bold ${isActive ? 'text-indigo-200' : 'text-slate-400'}`}>
+                          {item.labelUrdu}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
