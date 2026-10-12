@@ -8,7 +8,7 @@ export const ProductFilters = ({
   onSearchChange,
   selectedCategory,
   onCategoryChange,
-  stockFilter,
+  stockFilter,   
   onStockFilterChange,
   sortOption,
   onSortOptionChange,

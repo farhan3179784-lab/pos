@@ -152,7 +152,7 @@ export const AdminLayout = ({ children }) => {
       </header>
 
       {/* MAIN VIEW AREA */}
-      <main className="flex-1 w-full max-w-[1600px] mx-auto p-2 sm:p-4 lg:p-6">
+      <main className="flex-1 w-full max-w-[1600px] mx-auto p-2 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         {children}
       </main>
     </div>
