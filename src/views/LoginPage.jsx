@@ -142,8 +142,7 @@ export const LoginPage = () => {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@fusion.com"
-                  className="w-full bg-slate-50/80 hover:bg-slate-50 border border-slate-300/80 rounded-2xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 transition-all shadow-xs font-sans"
+                  className="w-full bg-slate-50/80 hover:bg-slate-50 border border-slate-300/80 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 transition-all shadow-xs font-sans"
                 />
               </div>
             </div>
@@ -171,8 +170,7 @@ export const LoginPage = () => {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-slate-50/80 hover:bg-slate-50 border border-slate-300/80 rounded-2xl px-4 py-3 pr-11 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 transition-all shadow-xs font-sans"
+                  className="w-full bg-slate-50/80 hover:bg-slate-50 border border-slate-300/80 rounded-2xl px-4 py-3 pr-11 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 transition-all shadow-xs font-sans"
                 />
                 <button
                   type="button"
