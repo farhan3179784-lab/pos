@@ -60,6 +60,7 @@ export const BillingPage = () => {
     searchInputRef.current?.focus();
   }, []);
 
+
   // Filter matching products for live search dropdown in billing
   const searchResults = useMemo(() => {
     const q = searchQuery.trim();
